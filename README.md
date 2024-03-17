@@ -1,73 +1,42 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# wx-bot-backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+本仓库用于存放微信机器人相关的后端服务应用代码。
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+技术栈： `Nest.js + TypeScript + MySQL + Redis + JWT + Webpack` 。
 
-## Description
+## 项目目录结构
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+由于 `Nest` 框架的最佳实践相对比较欠缺，因此在这里指定一套我们自己用于开发的规范，也便于后续的协作开发。
 
-## Installation
+以下的目录结构仅仅指在 `src` 目录下的结构：
 
-```bash
-$ yarn install
-```
+- app.module.ts：用于进行一系列的模块导入、全局providers的注册。
 
-## Running the app
+  具体的，比如TypeOrmModule、ConfigModule、JwtModule；以及全局拦截器、全局错误过滤器等。
 
-```bash
-# development
-$ yarn run start
+- main.ts：用于进行一系列插件的引入与注册、app的创建与启动、设置全局的一些配置。
 
-# watch mode
-$ yarn run start:dev
+- logs：该目录用于配置日志打印输出的一些配置。
 
-# production mode
-$ yarn run start:prod
-```
+- middleware：该目录用于放置中间件，一般直接使用 `nest g mi <中间件名>` 进行创建。
 
-## Test
+- error：该目录用于放置与错误相关的代码，包括：
 
-```bash
-# unit tests
-$ yarn run test
+  - errorCodeList.ts：用于自定义错误码。
+  - error.filter.ts：自定义错误过滤器，一般直接使用 `nest g f <过滤器名>` 进行创建。
+  - error.ts：自定义的异常，需要继承并实现nest中的相关接口。
 
-# e2e tests
-$ yarn run test:e2e
+- guards：用于存放守卫，直接使用 `nest g gu <守卫名>` 进行生成，一般用于配置与鉴权相关的函数，用于直接在controller中的对应函数使用。
 
-# test coverage
-$ yarn run test:cov
-```
+- utils：用于放置一些通用的工具函数，并且内部尽量一个不同的功能函数单独置为一个文件，最后通过 `index.ts` 进行统一暴露。
 
-## Support
+- [模块目录]：这个目录结构是最复杂的，一般直接通过 `nest g res <实体名> --no-spec` 进行创建（不需要测试文件）。
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+  ![创建user模块](https://common-1319721118.cos.ap-shanghai.myqcloud.com/picgo/%E5%88%9B%E5%BB%BAuser%E6%A8%A1%E5%9D%97.gif)
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+  - xxx.module.ts：用于配置这个模块的一些信息，用法和app.module.ts是一样的。如果是使用typeorm，需要在每个模块的这个文中的imports中配置resposity；如果这个模块是全局的，希望将其暴露，可以在@Module上方添加@Global装饰器。
+  - xxx.service.ts：用于配置服务，主要是实现和typeorm中与数据库直接交互的操作。
+  - xxx.controller.ts：用于配置路由，主要是用来将参数进行鉴权、并配置许多功能性装饰器进行修饰的操作，是service的前置操作，在最后是调用service中的函数进行数据库操作的。
+  - dto（Data Transfer Object）：用于配置各个请求中需要的数据格式，通常配合表单验证一起进行。对于service和controller来说，接收的就是对应的dto类型的数据。
+  - entities：通常用于配置这个模块中的实体的typeorm映射关系。
+  - vo：通常用于配置各个函数的返回数据的格式。
