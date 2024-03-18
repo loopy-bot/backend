@@ -1,11 +1,11 @@
-import { BaseEntity } from '../../common/baseClass/baseEntity';
+import { BaseEntity } from 'src/common/baseClass/baseEntity';
 import { Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
-import { Column } from '../../common/decorators/createColumn';
-import { Friend } from 'src/wx-resource/entities/friend.entity';
-import { Room } from 'src/wx-resource/entities/room.entity';
-import { Plugin } from 'src/plugins/entities/plugin.entity';
+import { Column } from 'src/decorators/createColumn';
+import { Friend } from 'src/modules/wx-resource/entities/friend.entity';
+import { Room } from 'src/modules/wx-resource/entities/room.entity';
+import { Plugin } from 'src/modules/plugins/entities/plugin.entity';
 
-import { Qwen } from 'src/common/model/qwen';
+import { Qwen } from 'src/modules/model/qwen';
 
 @Entity()
 export class App extends BaseEntity {

@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { App } from 'src/app/entities/app.entity';
+import { App } from 'src/modules/app/entities/app.entity';
 import { BaseEntity } from 'src/common/baseClass/baseEntity';
-import { Column } from 'src/common/decorators/createColumn';
+import { Column } from 'src/decorators/createColumn';
 import { Entity, JoinTable, ManyToMany } from 'typeorm';
 
 @Entity()

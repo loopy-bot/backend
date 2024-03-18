@@ -1,8 +1,8 @@
 import { Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
-import { BaseEntity } from '../../common/baseClass/baseEntity';
-import { Column } from 'src/common/decorators/createColumn';
-import { App } from 'src/app/entities/app.entity';
-import { Task } from 'src/task/entities/task.entity';
+import { BaseEntity } from 'src/common/baseClass/baseEntity';
+import { Column } from 'src/decorators/createColumn';
+import { App } from 'src/modules//app/entities/app.entity';
+import { Task } from 'src/modules//task/entities/task.entity';
 
 @Entity()
 export class Friend extends BaseEntity {

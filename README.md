@@ -18,13 +18,34 @@
 
 - logs：该目录用于配置日志打印输出的一些配置。
 
+- modules（模块目录）: 每个模块通常有自己的文件夹，包含模块的控制器、服务、模型等。
+
+  - module-name:
+    - dto（数据传输对象）: 存放 DTO 文件，用于定义接口数据。
+    - entities（实体）: 存放 ORM 实体类。
+    - controllers（控制器）: 存放处理 HTTP 请求的控制器类。
+    - services（服务）: 存放业务逻辑的服务类。
+    - module-name.module.ts: 模块定义文件，用于导入和导出模块中的元素。
+
 - middleware：该目录用于放置中间件，一般直接使用 `nest g mi <中间件名>` 进行创建。
 
-- error：该目录用于放置与错误相关的代码，包括：
+- common（公共资源）: 存放整个项目范围内共享的代码，如常量、接口、类型、装饰器等。
 
-  - errorCodeList.ts：用于自定义错误码。
-  - error.filter.ts：自定义错误过滤器，一般直接使用 `nest g f <过滤器名>` 进行创建。
-  - error.ts：自定义的异常，需要继承并实现nest中的相关接口。
+  - enum：存放枚举类。
+  - interface：存放接口。
+  - type：存放类型。
+
+- configs（配置）: 存放应用配置相关的代码和文件。
+
+- filters（过滤器）: 存放异常过滤器。
+
+- interceptors（拦截器）: 存放拦截器，用来改变函数的行为。
+
+- middleware（中间件）: 存放中间件。
+
+- decorators（装饰器）: 存放装饰器。
+
+- pipes（管道）: 存放数据转换和验证用的管道。
 
 - guards：用于存放守卫，直接使用 `nest g gu <守卫名>` 进行生成，一般用于配置与鉴权相关的函数，用于直接在controller中的对应函数使用。
 
