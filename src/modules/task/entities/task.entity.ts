@@ -1,8 +1,8 @@
-import { BaseEntity } from '../../common/baseClass/baseEntity';
+import { BaseEntity } from 'src/common/base-class/base-entity';
 import { Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
-import { Column } from '../../common/decorators/createColumn';
-import { Friend } from 'src/wx-resource/entities/friend.entity';
-import { Room } from 'src/wx-resource/entities/room.entity';
+import { Column } from 'src/decorators/create-column';
+import { Friend } from 'src/modules/wx-resource/entities/friend.entity';
+import { Room } from 'src/modules/wx-resource/entities/room.entity';
 
 @Entity()
 export class Task extends BaseEntity {

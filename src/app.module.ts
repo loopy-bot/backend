@@ -4,10 +4,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { TaskModule } from './task/task.module';
-import { AppModule as App } from './app/app.module';
-import { WxResourceModule } from './wx-resource/wx-resource.module';
-import { PluginsModule } from './plugins/plugins.module';
+import { TaskModule } from './modules/task/task.module';
+import { AppModule as App } from './modules/app/app.module';
+import { WxResourceModule } from './modules/wx-resource/wx-resource.module';
+import { PluginsModule } from './modules/plugins/plugins.module';
 
 @Module({
   imports: [
@@ -18,7 +18,7 @@ import { PluginsModule } from './plugins/plugins.module';
       poolSize: 10,
       logging: true,
       connectorPackage: 'mysql2',
-      entities: [__dirname + '/**/entities/*.entity{.js,.ts}'],
+      entities: [__dirname + '/modules/**/entities/*.entity{.js,.ts}'],
     }),
 
     App,
