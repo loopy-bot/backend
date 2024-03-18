@@ -7,7 +7,7 @@ import { Task } from 'src/modules//task/entities/task.entity';
 @Entity()
 export class Friend extends BaseEntity {
   @Column({ isRequired: true })
-  friendId: string;
+  wxId: string;
 
   @Column({ isRequired: true })
   name: string;

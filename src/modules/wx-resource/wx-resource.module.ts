@@ -6,6 +6,7 @@ import { Room } from './entities/room.entity';
 import { Friend } from './entities/friend.entity';
 import { Task } from 'src/modules/task/entities/task.entity';
 import { App } from 'src/modules/app/entities/app.entity';
+
 @Module({
   imports: [TypeOrmModule.forFeature([Room, Friend, Task, App])],
   controllers: [WxResourceController],

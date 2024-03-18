@@ -11,6 +11,6 @@ import { Qwen } from '../model/qwen.service';
 @Module({
   imports: [TypeOrmModule.forFeature([App, Plugin, Friend, Room])],
   controllers: [AppController],
-  providers: [AppService, Qwen],
+  providers: [AppService],
 })
 export class AppModule {}
