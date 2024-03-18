@@ -1,9 +1,9 @@
 import { App } from './entities/app.entity';
 import { Injectable, HttpException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Plugin } from 'src/plugins/entities/plugin.entity';
-import { Friend } from 'src/wx-resource/entities/friend.entity';
-import { Room } from 'src/wx-resource/entities/room.entity';
+import { Plugin } from 'src/modules/plugins/entities/plugin.entity';
+import { Friend } from 'src/modules/wx-resource/entities/friend.entity';
+import { Room } from 'src/modules/wx-resource/entities/room.entity';
 import { In, Repository } from 'typeorm';
 
 @Injectable()

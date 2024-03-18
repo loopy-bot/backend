@@ -2,7 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { WxResourceService } from './wx-resource.service';
 import { Room } from './entities/room.entity';
 import { Friend } from './entities/friend.entity';
-import { App } from 'src/app/entities/app.entity';
+import { App } from 'src/modules/app/entities/app.entity';
 
 @Controller('resource')
 export class WxResourceController {
