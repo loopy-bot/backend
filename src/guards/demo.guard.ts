@@ -3,9 +3,7 @@ import { Observable } from 'rxjs';
 
 @Injectable()
 export class DemoGuard implements CanActivate {
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     return true;
   }
 }

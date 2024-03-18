@@ -6,10 +6,11 @@ import { App } from './entities/app.entity';
 import { Plugin } from 'src/modules/plugins/entities/plugin.entity';
 import { Friend } from 'src/modules/wx-resource/entities/friend.entity';
 import { Room } from 'src/modules/wx-resource/entities/room.entity';
+import { Qwen } from '../model/qwen.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([App, Plugin, Friend, Room])],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, Qwen],
 })
 export class AppModule {}

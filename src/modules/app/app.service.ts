@@ -5,16 +5,20 @@ import { Plugin } from 'src/modules/plugins/entities/plugin.entity';
 import { Friend } from 'src/modules/wx-resource/entities/friend.entity';
 import { Room } from 'src/modules/wx-resource/entities/room.entity';
 import { In, Repository } from 'typeorm';
+import { Qwen } from '../model/qwen.service';
 
 @Injectable()
 export class AppService {
   constructor(
     @InjectRepository(App)
     private readonly appRepository: Repository<App>,
+
     @InjectRepository(Friend)
     private friendRepository: Repository<Friend>,
+
     @InjectRepository(Room)
     private roomRepository: Repository<Room>,
+
     @InjectRepository(Plugin)
     private pluginRepository: Repository<Plugin>,
   ) {}
@@ -41,7 +45,7 @@ export class AppService {
     return this.appRepository.save(app);
   }
 
-  // // 将应用绑定到多个群组
+  // 将应用绑定到多个群组
   async bindAppToRooms(appId: string, roomIds: string[]): Promise<App> {
     const app = await this.appRepository.findOneOrFail({ where: { id: appId }, relations: ['rooms'] });
     const rooms = await this.roomRepository.find({ where: { id: In(roomIds) } });
@@ -49,7 +53,7 @@ export class AppService {
     return this.appRepository.save(app);
   }
 
-  // // 给应用绑定插件
+  // 给应用绑定插件
   async bindAppToPlugins(appId: string, pluginIds: string[]): Promise<App> {
     const app = await this.appRepository.findOneOrFail({ where: { id: appId }, relations: ['plugins'] });
     const plugins = await this.pluginRepository.find({ where: { id: In(pluginIds) } });
@@ -73,5 +77,27 @@ export class AppService {
     }
     const res = await this.appRepository.delete(id);
     return !!res;
+  }
+
+  async getIntent(app: App, text: string) {
+    const qwen = new Qwen(app.personality);
+    const pluginTypes = app.plugins.map((i) => i.type);
+    const intentType = await qwen.genarate(
+      `请你根据用户问题推测用户意图，意图是固定的，只有如下几个：${pluginTypes}，如果用户意图属于这其中一个。那就把这个值单独返回出来，否则就返回null。问题如下：${text}`,
+    );
+    return intentType;
+  }
+
+  async reply(app: App, id: string, text: string) {
+    const qwen = new Qwen(app.personality);
+    const intent = await this.getIntent(app, text);
+    const plugin = app.plugins.find((i) => i.type === intent);
+    if (plugin) {
+      return plugin.reply(text);
+    } else {
+      return new Promise((resolve) => {
+        qwen.chat(id, text, resolve);
+      });
+    }
   }
 }

@@ -1,13 +1,16 @@
+import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 
-type Message = { role: string; content: string };
+type Message = { role: string; content: string | Message };
 
+@Injectable()
 export class Qwen {
   MAX_CONTEXT: number;
   contextStorage: Record<string, any>;
   messageQueues: Record<string, Message[]>;
   pendingPromises: Record<string, boolean>;
   personality: Message;
+
   constructor(personality: string) {
     this.personality = { role: 'system', content: personality };
     this.MAX_CONTEXT = 8;
@@ -16,11 +19,11 @@ export class Qwen {
     this.pendingPromises = {};
   }
 
-  getContext(key) {
+  getContext(key: string) {
     return [this.personality, ...this.contextStorage[key]] || [];
   }
 
-  updateContext(key, message) {
+  updateContext(key: string, message: Message) {
     if (!this.contextStorage[key]) {
       this.contextStorage[key] = [];
     }
@@ -31,7 +34,7 @@ export class Qwen {
     this.contextStorage[key].push(message);
   }
 
-  async processQueue(key, callback) {
+  async processQueue(key: string, callback: any) {
     if (this.messageQueues[key].length === 0 || this.pendingPromises[key]) {
       return; // 如果队列为空或者已经有一个消息正在处理，则不进行操作
     }
@@ -49,7 +52,7 @@ export class Qwen {
     this.pendingPromises[key] = false;
   }
 
-  async chat(key, text, callback) {
+  async chat(key: string, text: any, callback: any) {
     if (!this.messageQueues[key]) {
       this.messageQueues[key] = [];
     }
@@ -60,7 +63,6 @@ export class Qwen {
   }
   async genarate(text: string) {
     const messages = [this.personality, { role: 'user', content: text }];
-    // 这是一个假设的异步函数，你需要根据实际需要来实现
     return axios({
       url: 'http://127.0.0.1:8766/chat',
       method: 'post',
@@ -68,7 +70,6 @@ export class Qwen {
     }).then((res) => res.data);
   }
   async request(messages: Message[]) {
-    // 这是一个假设的异步函数，你需要根据实际需要来实现
     return axios({
       url: 'http://127.0.0.1:8766/chat',
       method: 'post',
