@@ -1,5 +1,5 @@
 import { Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
-import { BaseEntity } from 'src/common/baseClass/baseEntity';
+import { BaseEntity } from 'src/common/base-class/base-entity';
 import { Column } from 'src/decorators/create-column';
 import { App } from 'src/modules/app/entities/app.entity';
 import { Task } from 'src/modules/task/entities/task.entity';
