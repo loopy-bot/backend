@@ -7,16 +7,13 @@ import { Task } from 'src/modules/task/entities/task.entity';
 @Entity()
 export class Room extends BaseEntity {
   @Column({ nullable: true, isRequired: true })
-  topic: string;
+  name: string;
 
   @Column({ isRequired: true })
-  roomId: string;
+  wxId: string;
 
   @Column({ isRequired: true })
-  memberLength: number;
-
-  @Column({ isRequired: true })
-  appId: string;
+  memberCount: number;
 
   @ManyToMany(() => Task, (task) => task.friends)
   tasks: Task[];

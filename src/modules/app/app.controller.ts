@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
 import { App } from './entities/app.entity';
-import { logMethodName } from 'src/decorators/logMethodName';
+import { logMethodName } from 'src/decorators/log-method-name';
 import { AppService } from './app.service';
 
 @Controller('api/applications')
