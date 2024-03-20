@@ -55,17 +55,17 @@ export class WxResourceController {
     return this.wxResourceService.deleteFriendById(id);
   }
 
+  // 删除群聊
+  @Delete('rooms/:id')
+  deleteRoomById(@Param('id') id: string): Promise<void> {
+    return this.wxResourceService.deleteRoomById(id);
+  }
   // 更新朋友
   @Put('friends/:id')
   updateFriend(@Param('id') id: string, @Body() updateData: Partial<Friend>): Promise<Friend> {
     return this.wxResourceService.updateFriend(id, updateData);
   }
 
-  // 删除群聊
-  @Delete('rooms/:id')
-  deleteRoomById(@Param('id') id: string): Promise<void> {
-    return this.wxResourceService.deleteRoomById(id);
-  }
   // 更新群聊
   @Put('rooms/:id')
   updateRoom(@Param('id') id: string, @Body() updateData: Partial<Room>): Promise<Room> {
