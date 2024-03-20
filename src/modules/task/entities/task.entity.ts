@@ -1,15 +1,16 @@
 import { BaseEntity } from 'src/common/base-class/base-entity';
-import { Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
+import { Entity, JoinTable, ManyToMany } from 'typeorm';
 import { Column } from 'src/decorators/create-column';
 import { Friend } from 'src/modules/wx-resource/entities/friend.entity';
 import { Room } from 'src/modules/wx-resource/entities/room.entity';
+import { Plugin } from 'src/modules/plugins/entities/plugin.entity';
 
 @Entity()
 export class Task extends BaseEntity {
   @Column({ isRequired: true })
   name: string;
 
-  @Column({ isRequired: true })
+  @Column({ isRequired: true, type: 'bigint' })
   time?: number;
 
   @Column({ isRequired: false, nullable: true })
@@ -23,9 +24,13 @@ export class Task extends BaseEntity {
 
   @ManyToMany(() => Friend, (friend) => friend.tasks)
   @JoinTable()
-  friends: Friend[];
+  friends?: Friend[];
 
   @ManyToMany(() => Room, (room) => room.tasks)
   @JoinTable()
-  rooms: Room[];
+  rooms?: Room[];
+
+  @ManyToMany(() => Plugin, (plugin) => plugin.tasks)
+  @JoinTable()
+  plugins?: Plugin[];
 }
