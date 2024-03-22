@@ -3,6 +3,7 @@ import { App } from 'src/modules/app/entities/app.entity';
 import { BaseEntity } from 'src/common/base-class/base-entity';
 import { Column } from 'src/decorators/create-column';
 import { Entity, JoinTable, ManyToMany } from 'typeorm';
+import { Task } from 'src/modules/task/entities/task.entity';
 
 @Entity()
 export class Plugin extends BaseEntity {
@@ -23,6 +24,8 @@ export class Plugin extends BaseEntity {
   @ManyToMany(() => App)
   apps: App[];
 
+  @ManyToMany(() => Task)
+  tasks: Task[];
   async reply(text: string) {
     return axios({
       url: this.url,

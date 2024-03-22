@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Friend } from './entities/friend.entity';
 import { App } from 'src/modules/app/entities/app.entity';
 import { Room } from './entities/room.entity';
+import { PaginationParams } from 'src/utils/findEntitiesWithPagination';
 
 @Injectable()
 export class WxResourceService {
@@ -71,7 +72,10 @@ export class WxResourceService {
     return updatedRoom;
   }
   // 查询所有朋友
-  async findAllFriends(): Promise<Friend[]> {
+  async findAllFriends(
+    paginationParams: PaginationParams,
+    conditions: { name: string; wxId: string },
+  ): Promise<Friend[]> {
     return this.friendRepository.find();
   }
   // 查询所有群聊

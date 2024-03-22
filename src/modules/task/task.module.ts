@@ -5,8 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Room } from 'src/modules/wx-resource/entities/room.entity';
 import { Friend } from 'src/modules/wx-resource/entities/friend.entity';
 import { Task } from './entities/task.entity';
+import { Plugin } from '../plugins/entities/plugin.entity';
 @Module({
-  imports: [TypeOrmModule.forFeature([Room, Friend, Task])],
+  imports: [TypeOrmModule.forFeature([Room, Friend, Task, Plugin])],
   controllers: [TaskController],
   providers: [TaskService],
 })
