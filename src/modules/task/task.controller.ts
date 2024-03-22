@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { Task } from './entities/task.entity';
 import { TaskService } from './task.service';
 import { PaginationParams } from 'src/utils/findEntitiesWithPagination';
@@ -7,26 +7,26 @@ import { PaginationParams } from 'src/utils/findEntitiesWithPagination';
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
-  @Post()
+  @Post('create')
   async addTask(@Body() task: Task): Promise<Task> {
     return this.taskService.addTask(task);
   }
 
-  @Put(':id')
-  async updateTask(@Param('id') id: string, @Body() task: Task): Promise<Task> {
+  @Post('edit')
+  async updateTask(@Body('id') id: string, @Body() task: Task): Promise<Task> {
     return this.taskService.updateTask(id, task);
   }
 
-  @Get()
+  @Post('list')
   async findAllTasks(
-    @Query() params: PaginationParams & { startTime: number; endTime: number; name: string },
+    @Body() params: PaginationParams & { startTime: number; endTime: number; name: string },
   ): Promise<any> {
     const { page, pageSize, ...rest } = params;
     return this.taskService.findAllTasks({ page, pageSize }, rest);
   }
 
-  @Delete(':id')
-  async deleteTaskById(@Param('id') id: string): Promise<string> {
+  @Post('delete')
+  async deleteTaskById(@Body('id') id: string): Promise<string> {
     return this.taskService.deleteTaskById(id);
   }
 }
