@@ -1,32 +1,31 @@
 import { Controller, Post, Body } from '@nestjs/common';
-import { Task } from './entities/task.entity';
 import { TaskService } from './task.service';
-import { PaginationParams } from 'src/utils/findEntitiesWithPagination';
+import { AddTaskDto } from './dto/add-task.dto';
+import { EditTaskDto } from './dto/edit-task.dto';
+import { PaginationTaskDto } from './dto/pagination-task.dto';
+import { DelTaskDto } from './dto/del-task.dto';
 
 @Controller('task')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @Post('create')
-  async addTask(@Body() task: Task): Promise<Task> {
-    return this.taskService.addTask(task);
+  async addTask(@Body() addTaskDto: AddTaskDto): Promise<AddTaskDto> {
+    return this.taskService.addTask(addTaskDto);
   }
 
   @Post('edit')
-  async updateTask(@Body('id') id: string, @Body() task: Task): Promise<Task> {
-    return this.taskService.updateTask(id, task);
+  async updateTask(@Body() editTaskDto: EditTaskDto): Promise<EditTaskDto> {
+    return this.taskService.updateTask(editTaskDto);
   }
 
   @Post('list')
-  async findAllTasks(
-    @Body() params: PaginationParams & { startTime: number; endTime: number; name: string },
-  ): Promise<any> {
-    const { page, pageSize, ...rest } = params;
-    return this.taskService.findAllTasks({ page, pageSize }, rest);
+  async findAllTasks(@Body() paginationTaskDto: PaginationTaskDto): Promise<any> {
+    return this.taskService.findAllTasks(paginationTaskDto);
   }
 
   @Post('delete')
-  async deleteTaskById(@Body('id') id: string): Promise<string> {
-    return this.taskService.deleteTaskById(id);
+  async deleteTaskById(@Body() delTaskDto: DelTaskDto): Promise<string> {
+    return this.taskService.deleteTaskById(delTaskDto);
   }
 }

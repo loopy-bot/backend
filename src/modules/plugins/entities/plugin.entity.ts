@@ -1,37 +1,31 @@
-import axios from 'axios';
 import { App } from 'src/modules/app/entities/app.entity';
 import { BaseEntity } from 'src/common/base-class/base-entity';
-import { Column } from 'src/decorators/create-column';
-import { Entity, JoinTable, ManyToMany } from 'typeorm';
+import { Column, Entity, ManyToMany } from 'typeorm';
 import { Task } from 'src/modules/task/entities/task.entity';
 
 @Entity()
 export class Plugin extends BaseEntity {
-  @Column({ isRequired: true })
+  @Column()
   name: string;
-  @Column({ isRequired: true })
+
+  @Column()
   type: string;
-  @Column({ isRequired: false, nullable: true })
-  description?: string;
-  @Column({ isRequired: true })
+
+  @Column()
+  description: string;
+
+  @Column()
   url: string;
-  @Column({ isRequired: true })
+
+  @Column()
   method: 'POST' | 'GET';
 
-  @Column({ isRequired: true })
+  @Column()
   responseType: 'json' | 'arraybuffer';
 
-  @ManyToMany(() => App)
+  @ManyToMany(() => App, (app) => app.plugins)
   apps: App[];
 
-  @ManyToMany(() => Task)
+  @ManyToMany(() => Task, (task) => task.plugins)
   tasks: Task[];
-  async reply(text: string) {
-    return axios({
-      url: this.url,
-      method: this.method,
-      params: { text },
-      headers: { responseType: this.responseType },
-    });
-  }
 }

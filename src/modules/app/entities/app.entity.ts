@@ -1,20 +1,19 @@
 import { BaseEntity } from 'src/common/base-class/base-entity';
-import { Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
-import { Column } from 'src/decorators/create-column';
+import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 import { Friend } from 'src/modules/wx-resource/entities/friend.entity';
 import { Room } from 'src/modules/wx-resource/entities/room.entity';
 import { Plugin } from 'src/modules/plugins/entities/plugin.entity';
 
 @Entity()
 export class App extends BaseEntity {
-  @Column({ isRequired: true })
+  @Column()
   name: string;
 
-  @Column({ isRequired: false, nullable: true })
-  description?: string;
+  @Column()
+  description: string;
 
-  @Column({ isRequired: false, nullable: true })
-  personality?: string;
+  @Column()
+  personality: string;
 
   @OneToMany(() => Friend, (user) => user.app)
   friends: Friend[];
@@ -22,7 +21,7 @@ export class App extends BaseEntity {
   @OneToMany(() => Room, (user) => user.app)
   rooms: Room[];
 
-  @ManyToMany(() => Plugin)
+  @ManyToMany(() => Plugin, (plugin) => plugin.apps)
   @JoinTable()
   plugins: Plugin[];
 }
