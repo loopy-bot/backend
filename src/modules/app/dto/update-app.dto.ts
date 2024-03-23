@@ -1,6 +1,5 @@
 export class UpdateAppDto {
-  appId: string;
-  agentKey: string;
+  id: string;
   name: string;
   description: string;
 }

@@ -52,7 +52,7 @@ export class AppService {
 
   // 更新应用
   async update(updateAppDto: UpdateAppDto): Promise<App> {
-    const { appId: id, ...info } = updateAppDto;
+    const { id: id, ...info } = updateAppDto;
     const existingData = await this.findOne(id);
     if (!existingData) {
       throw new HttpException(`${id} not found`, 404);
@@ -73,8 +73,8 @@ export class AppService {
 
   // 将应用绑定到多个好友
   async bindAppToFriends(bindAppToFriendsDto: BindAppToFriendsDto): Promise<App> {
-    const { appId, friendIds } = bindAppToFriendsDto;
-    const app = await this.appRepository.findOneOrFail({ where: { id: appId }, relations: ['friends'] });
+    const { id, friendIds } = bindAppToFriendsDto;
+    const app = await this.appRepository.findOneOrFail({ where: { id: id }, relations: ['friends'] });
     const friends = await this.friendRepository.find({ where: { id: In(friendIds) } });
 
     app.friends = [...app.friends, ...friends];
@@ -83,8 +83,8 @@ export class AppService {
 
   // 将应用绑定到多个群组
   async bindAppToRooms(bindAppToRoomsDto: BindAppToRoomsDto): Promise<App> {
-    const { appId, roomIds } = bindAppToRoomsDto;
-    const app = await this.appRepository.findOneOrFail({ where: { id: appId }, relations: ['rooms'] });
+    const { id, roomIds } = bindAppToRoomsDto;
+    const app = await this.appRepository.findOneOrFail({ where: { id: id }, relations: ['rooms'] });
     const rooms = await this.roomRepository.find({ where: { id: In(roomIds) } });
     app.rooms = [...app.rooms, ...rooms];
     return this.appRepository.save(app);
@@ -92,8 +92,8 @@ export class AppService {
 
   // 给应用绑定插件
   async bindAppToPlugins(bindAppToPluginsDto: BindAppToPluginsDto): Promise<App> {
-    const { appId, pluginIds } = bindAppToPluginsDto;
-    const app = await this.appRepository.findOneOrFail({ where: { id: appId }, relations: ['plugins'] });
+    const { id, pluginIds } = bindAppToPluginsDto;
+    const app = await this.appRepository.findOneOrFail({ where: { id: id }, relations: ['plugins'] });
     const plugins = await this.pluginRepository.find({ where: { id: In(pluginIds) } });
     app.plugins = [...app.plugins, ...plugins];
     return this.appRepository.save(app);
@@ -101,8 +101,8 @@ export class AppService {
 
   // 根据用户问题推测用户意图
   async getIntent(getIntentDto: GetIntentDto) {
-    const { appId, text } = getIntentDto;
-    const app = await this.findOne(appId);
+    const { id, text } = getIntentDto;
+    const app = await this.findOne(id);
     const qwen = this.createQwenInstance(app.personality);
     const pluginTypes = app.plugins.map((i) => i.type);
     const intentType = await qwen.genarate(
@@ -113,10 +113,10 @@ export class AppService {
 
   // 应用回复
   async reply(replyDto: ReplyDto) {
-    const { appId, id, text } = replyDto;
-    const app = await this.findOne(appId);
+    const { id, id, text } = replyDto;
+    const app = await this.findOne(id);
     const qwen = this.createQwenInstance(app.personality);
-    const intent = await this.getIntent({ appId, text });
+    const intent = await this.getIntent({ id, text });
     const plugin = app.plugins.find((i) => i.type === intent);
     if (plugin) {
       return this.pluginsService.reply({

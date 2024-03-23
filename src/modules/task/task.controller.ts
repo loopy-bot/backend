@@ -3,7 +3,6 @@ import { TaskService } from './task.service';
 import { AddTaskDto } from './dto/add-task.dto';
 import { EditTaskDto } from './dto/edit-task.dto';
 import { PaginationTaskDto } from './dto/pagination-task.dto';
-import { DelTaskDto } from './dto/del-task.dto';
 
 @Controller('task')
 export class TaskController {
@@ -25,7 +24,7 @@ export class TaskController {
   }
 
   @Post('delete')
-  async deleteTaskById(@Body() delTaskDto: DelTaskDto): Promise<string> {
-    return this.taskService.deleteTaskById(delTaskDto);
+  async deleteTaskById(@Body('id') id: string): Promise<string> {
+    return this.taskService.deleteTaskById(id);
   }
 }

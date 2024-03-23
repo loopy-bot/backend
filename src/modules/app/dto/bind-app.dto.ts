@@ -1,14 +1,14 @@
 export class BindAppToFriendsDto {
-  appId: string;
+  id: string;
   friendIds: string[];
 }
 
 export class BindAppToRoomsDto {
-  appId: string;
+  id: string;
   roomIds: string[];
 }
 
 export class BindAppToPluginsDto {
-  appId: string;
+  id: string;
   pluginIds: string[];
 }

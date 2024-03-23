@@ -6,7 +6,6 @@ import { pagingQuery, getTimestamp } from 'src/utils/pagingQuery';
 import { AddTaskDto } from './dto/add-task.dto';
 import { EditTaskDto } from './dto/edit-task.dto';
 import { PaginationTaskDto } from './dto/pagination-task.dto';
-import { DelTaskDto } from './dto/del-task.dto';
 
 @Injectable()
 export class TaskService {
@@ -37,8 +36,8 @@ export class TaskService {
     return res;
   }
 
-  async deleteTaskById(delTaskDto: DelTaskDto) {
-    const res = await this.taskRepository.delete({ id: delTaskDto.id });
+  async deleteTaskById(id: string) {
+    const res = await this.taskRepository.delete(id);
     if (res.affected === 0) {
       throw new Error('Task not found');
     }
