@@ -28,7 +28,7 @@ export class PluginsController {
   }
 
   // 根据id获取单个插件
-  @Post('item')
+  @Post('detail')
   async findOne(@Body('id') id: string) {
     return this.pluginsService.findOne(id);
   }

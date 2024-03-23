@@ -13,7 +13,7 @@ export class AppController {
     return this.appServer.findAll();
   }
 
-  @Post('item')
+  @Post('detail')
   async findOne(@Body('id') id: string): Promise<App> {
     return this.appServer.findOne(id);
   }
