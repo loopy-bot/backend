@@ -4,16 +4,15 @@ import { Repository } from 'typeorm';
 import { Friend } from './entities/friend.entity';
 import { App } from 'src/modules/app/entities/app.entity';
 import { Room } from './entities/room.entity';
-import { PaginationParams } from 'src/utils/findEntitiesWithPagination';
+import { PaginationParams } from 'src/utils/pagingQuery';
 
 @Injectable()
 export class WxResourceService {
-  constructor(
-    @InjectRepository(Friend)
-    private friendRepository: Repository<Friend>,
-    @InjectRepository(Room)
-    private roomRepository: Repository<Room>,
-  ) {}
+  @InjectRepository(Friend)
+  private friendRepository: Repository<Friend>;
+
+  @InjectRepository(Room)
+  private roomRepository: Repository<Room>;
 
   // 批量保存朋友
   async saveRooms(rooms: Room[]): Promise<Room[]> {

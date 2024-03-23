@@ -16,7 +16,6 @@ import { PluginsModule } from './modules/plugins/plugins.module';
       type: 'mysql',
       synchronize: true,
       poolSize: 10,
-      // logging: true,
       connectorPackage: 'mysql2',
       entities: [__dirname + '/modules/**/entities/*.entity{.js,.ts}'],
     }),

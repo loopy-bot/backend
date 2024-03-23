@@ -1,39 +1,35 @@
-import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { App } from './entities/app.entity';
-import { logMethodName } from 'src/decorators/log-method-name';
 import { AppService } from './app.service';
+import { CreateAppDto } from './dto/create-app.dto';
+import { UpdateAppDto } from './dto/update-app.dto';
 
-@Controller('api/applications')
+@Controller('application')
 export class AppController {
   constructor(private readonly appServer: AppService) {}
 
-  @Get()
-  @logMethodName
+  @Post('list')
   async findAll(): Promise<App[]> {
     return this.appServer.findAll();
   }
 
-  @Get(':id')
-  @logMethodName
-  async findOne(@Param('id') id: string): Promise<App> {
+  @Post('detail')
+  async findOne(@Body('id') id: string): Promise<App> {
     return this.appServer.findOne(id);
   }
 
-  @Post()
-  @logMethodName
-  async create(@Body() App: App): Promise<App> {
-    return this.appServer.create(App);
+  @Post('create')
+  async create(@Body() createAppDto: CreateAppDto): Promise<App> {
+    return this.appServer.create(createAppDto);
   }
 
-  @Put(':id')
-  @logMethodName
-  async update(@Param('id') id: string, @Body() App: App): Promise<App> {
-    return this.appServer.update(id, App);
+  @Post('update')
+  async update(@Body() updateAppDto: UpdateAppDto): Promise<App> {
+    return this.appServer.update(updateAppDto);
   }
 
-  @Delete(':id')
-  @logMethodName
-  async delete(@Param('id') id: string): Promise<boolean> {
+  @Post('delete')
+  async delete(@Body('id') id: string): Promise<boolean> {
     return this.appServer.delete(id);
   }
 }

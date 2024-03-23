@@ -4,11 +4,12 @@ export interface PaginationParams {
   page: number;
   pageSize: number;
 }
+
 export const getTimestamp = (startTime: number, endTime: number) => {
   return Between(startTime, endTime);
 };
-// export const ge
-export const findEntitiesWithPagination = async <Entity, Conditions>(
+
+export const pagingQuery = async <Entity, Conditions>(
   paginationParams: PaginationParams,
   conditions: Conditions,
   repository: Repository<Entity>,
@@ -19,7 +20,6 @@ export const findEntitiesWithPagination = async <Entity, Conditions>(
   const options: FindManyOptions = {
     take: pageSize,
     skip: (page - 1) * pageSize,
-    // 剔除null // undefined
     where: Object.entries(conditions).reduce((acc, [key, value]) => {
       if (value !== null && value !== undefined) {
         acc[key] = value;

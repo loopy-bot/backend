@@ -2,40 +2,37 @@ import { Injectable } from '@nestjs/common';
 import { Task } from './entities/task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { PaginationParams, findEntitiesWithPagination, getTimestamp } from 'src/utils/findEntitiesWithPagination';
+import { pagingQuery, getTimestamp } from 'src/utils/pagingQuery';
+import { AddTaskDto } from './dto/add-task.dto';
+import { EditTaskDto } from './dto/edit-task.dto';
+import { PaginationTaskDto } from './dto/pagination-task.dto';
 
 @Injectable()
 export class TaskService {
-  constructor(
-    @InjectRepository(Task)
-    private taskRepository: Repository<Task>,
-  ) {}
+  @InjectRepository(Task)
+  private taskRepository: Repository<Task>;
 
-  async addTask(task: Task) {
-    const val = this.taskRepository.create(task);
+  async addTask(addTaskDto: AddTaskDto) {
+    const val = this.taskRepository.create(addTaskDto);
     return this.taskRepository.save(val);
   }
 
-  async updateTask(id, task: Task) {
-    await this.taskRepository.update(id, task);
-    const updateData = await this.taskRepository.findOneBy({ id });
-    if (updateData) {
-      new Error('Update error');
+  async updateTask(editTaskInfo: EditTaskDto) {
+    const result = await this.taskRepository.update(editTaskInfo.id, editTaskInfo);
+    if (result.affected === 0) {
+      throw new Error('Task not found');
     }
-    return updateData;
+    const updatedTask = await this.taskRepository.findOne({ where: { id: editTaskInfo.id } });
+    return updatedTask;
   }
 
-  // 查询-分页-条件
-  async findAllTasks(
-    paginationParams: PaginationParams,
-    conditions: { startTime?: number; endTime?: number; name?: string },
-  ) {
+  async findAllTasks(paginationTaskDto: PaginationTaskDto) {
     let time = null;
-    const { startTime, endTime, ...rest } = conditions;
+    const { startTime, endTime, name, ...paginationParams } = paginationTaskDto;
     if (startTime && endTime) {
       time = getTimestamp(startTime, endTime);
     }
-    const res = await findEntitiesWithPagination(paginationParams, { ...rest, time }, this.taskRepository);
+    const res = await pagingQuery(paginationParams, { name, time }, this.taskRepository);
     return res;
   }
 

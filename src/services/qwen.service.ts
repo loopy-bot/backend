@@ -61,6 +61,7 @@ export class Qwen {
 
     await this.processQueue(key, callback); // 不需要await，这样就允许不同的key并行处理
   }
+
   async genarate(text: string) {
     const messages = [this.personality, { role: 'user', content: text }];
     return axios({
@@ -69,6 +70,7 @@ export class Qwen {
       params: { messages },
     }).then((res) => res.data);
   }
+
   async request(messages: Message[]) {
     return axios({
       url: 'http://127.0.0.1:8766/chat',
