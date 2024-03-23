@@ -11,7 +11,7 @@ import { CreateAppDto } from './dto/create-app.dto';
 import { UpdateAppDto } from './dto/update-app.dto';
 import { BindAppToFriendsDto, BindAppToPluginsDto, BindAppToRoomsDto } from './dto/bind-app.dto';
 import { GetIntentDto, ReplyDto } from './dto/qwen.dto';
-
+7;
 @Injectable()
 export class AppService {
   @InjectRepository(App)
@@ -113,17 +113,15 @@ export class AppService {
 
   // 应用回复
   async reply(replyDto: ReplyDto) {
-    const { id, id, text } = replyDto;
+    const { id, text } = replyDto;
     const app = await this.findOne(id);
     const qwen = this.createQwenInstance(app.personality);
     const intent = await this.getIntent({ id, text });
     const plugin = app.plugins.find((i) => i.type === intent);
     if (plugin) {
       return this.pluginsService.reply({
-        url: plugin.url,
-        method: plugin.method,
+        pluginId: plugin.id,
         text,
-        responseType: plugin.responseType,
       });
     } else {
       return new Promise((resolve) => {
