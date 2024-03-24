@@ -1,21 +1,22 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get } from '@nestjs/common';
 import { TaskService } from './task.service';
-import { AddTaskDto } from './dto/add-task.dto';
-import { EditTaskDto } from './dto/edit-task.dto';
+
 import { PaginationTaskDto } from './dto/pagination-task.dto';
+import { Model } from 'src/services/model.service';
+import { TaskDto } from './dto/task.dto';
 
 @Controller('task')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @Post('create')
-  async addTask(@Body() addTaskDto: AddTaskDto): Promise<AddTaskDto> {
+  async addTask(@Body() addTaskDto: TaskDto) {
     return this.taskService.addTask(addTaskDto);
   }
 
   @Post('edit')
-  async updateTask(@Body() editTaskDto: EditTaskDto): Promise<EditTaskDto> {
-    return this.taskService.updateTask(editTaskDto);
+  async updateTask(@Body('id') id, @Body() editTaskDto: TaskDto) {
+    return this.taskService.updateTask(id, editTaskDto);
   }
 
   @Post('list')
@@ -26,5 +27,28 @@ export class TaskController {
   @Post('delete')
   async deleteTaskById(@Body('id') id: string): Promise<string> {
     return this.taskService.deleteTaskById(id);
+  }
+
+  @Post('rooms/bind')
+  async bindTaskToRoom(@Body('id') id, @Body('roomIds') roomIds: string[]) {
+    console.log(id, roomIds);
+    return this.taskService.bindRoomsToTask(id, roomIds);
+  }
+  @Post('friends/bind')
+  async bindTaskToFriend(@Body('id') id, @Body('friendIds') friendIds: string[]) {
+    return this.taskService.bindFriendsToTask(id, friendIds);
+  }
+
+  @Post('active')
+  async onTaskActive(@Body('id') id) {
+    const task = await this.taskService.findOneTaskById(id);
+    if (!task) {
+      throw new Error('Task not found');
+    }
+    // const res = await Model.genarate({
+    //   model: 'kimi',
+    //   question: task.text,
+    // });
+    return task.text;
   }
 }

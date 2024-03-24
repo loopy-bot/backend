@@ -1,8 +1,7 @@
 import { Body, Controller, Inject, Post } from '@nestjs/common';
 import { PluginsService } from './plugins.service';
-import { CreatePluginDto } from './dto/create-plugin.dto';
-import { UpdatePluginDto } from './dto/update-plugin.dto';
-import { ReplyDto } from './dto/reply.dto';
+
+import { PluginDto } from './dto/plugin.dto';
 
 @Controller('plugins')
 export class PluginsController {
@@ -11,8 +10,8 @@ export class PluginsController {
 
   // 新增插件
   @Post('create')
-  async create(@Body() createPluginDto: CreatePluginDto) {
-    return this.pluginsService.create(createPluginDto);
+  async create(@Body() plugin: PluginDto) {
+    return this.pluginsService.create(plugin);
   }
 
   // 删除插件
@@ -23,8 +22,8 @@ export class PluginsController {
 
   // 修改插件
   @Post('update')
-  async update(@Body() updatePluginDto: UpdatePluginDto) {
-    return this.pluginsService.update(updatePluginDto);
+  async update(@Body('id') id: string, @Body() plugin: PluginDto) {
+    return this.pluginsService.update(id, plugin);
   }
 
   // 根据id获取单个插件
@@ -37,11 +36,5 @@ export class PluginsController {
   @Post('list')
   async findAll() {
     return this.pluginsService.findAll();
-  }
-
-  // 调用其他的服务
-  @Post('reply')
-  async reply(@Body() replyDto: ReplyDto) {
-    return this.pluginsService.reply(replyDto);
   }
 }

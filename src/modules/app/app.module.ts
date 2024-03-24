@@ -4,8 +4,8 @@ import { AppController } from './app.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { App } from './entities/app.entity';
 import { Plugin } from 'src/modules/plugins/entities/plugin.entity';
-import { Friend } from 'src/modules/wx-resource/entities/friend.entity';
-import { Room } from 'src/modules/wx-resource/entities/room.entity';
+import { Friend } from 'src/modules/wx/entities/friend.entity';
+import { Room } from 'src/modules/wx/entities/room.entity';
 import { PluginsService } from '../plugins/plugins.service';
 
 @Module({

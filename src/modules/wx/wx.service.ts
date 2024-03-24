@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { Friend } from './entities/friend.entity';
 import { App } from 'src/modules/app/entities/app.entity';
 import { Room } from './entities/room.entity';
-import { PaginationParams } from 'src/utils/pagingQuery';
+import { PaginationParams, pagingQuery } from 'src/utils/pagingQuery';
 
 @Injectable()
-export class WxResourceService {
+export class WxService {
   @InjectRepository(Friend)
   private friendRepository: Repository<Friend>;
 
@@ -71,15 +71,46 @@ export class WxResourceService {
     return updatedRoom;
   }
   // 查询所有朋友
-  async findAllFriends(
-    paginationParams: PaginationParams,
-    conditions: { name: string; wxId: string },
-  ): Promise<Friend[]> {
-    return this.friendRepository.find();
+  async findAllFriends(paginationParams: PaginationParams, conditions: { name: string; wxId: string } = {} as any) {
+    // 准备查询条件
+    const queryConditions: any = {};
+
+    if (conditions.name) {
+      queryConditions.name = Like(`%${conditions.name}%`);
+    }
+    if (conditions.wxId) {
+      queryConditions.wxId = conditions.wxId;
+    }
+    const res = await pagingQuery(paginationParams, queryConditions, this.friendRepository);
+    return res;
   }
   // 查询所有群聊
-  async findAllRooms(): Promise<Room[]> {
-    return this.roomRepository.find();
+  async findAllRooms(paginationParams: PaginationParams, conditions: { name: string; wxId: string } = {} as any) {
+    // 准备查询条件
+    const queryConditions: any = {};
+    if (conditions.name) {
+      queryConditions.name = Like(`%${conditions.name}%`);
+    }
+    if (conditions.wxId) {
+      queryConditions.wxId = conditions.wxId;
+    }
+    const res = await pagingQuery(paginationParams, queryConditions, this.roomRepository);
+    return res;
+  }
+
+  async findAllTasks() {
+    const friendsWithTasks = await this.friendRepository.find({
+      relations: ['tasks'], // 加载 tasks 关系
+    });
+
+    const roomsWithTasks = await this.roomRepository.find({
+      relations: ['tasks'], // 加载 tasks 关系
+    });
+
+    return {
+      friends: friendsWithTasks,
+      rooms: roomsWithTasks,
+    };
   }
   // 根据ID查询单个朋友
   async findFriendById(id: string): Promise<Friend> {

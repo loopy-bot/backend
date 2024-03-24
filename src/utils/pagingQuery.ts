@@ -1,6 +1,6 @@
 import { Between, FindManyOptions, Repository } from 'typeorm';
 
-export interface PaginationParams {
+export class PaginationParams {
   page: number;
   pageSize: number;
 }
@@ -13,7 +13,7 @@ export const pagingQuery = async <Entity, Conditions>(
   paginationParams: PaginationParams,
   conditions: Conditions,
   repository: Repository<Entity>,
-): Promise<any> => {
+) => {
   const page = +paginationParams.page;
   const pageSize = +paginationParams.pageSize;
 
@@ -32,7 +32,7 @@ export const pagingQuery = async <Entity, Conditions>(
   return {
     page,
     pageSize,
-    data: result[0],
+    content: result[0],
     total: result[1],
   };
 };

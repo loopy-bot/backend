@@ -1,9 +1,18 @@
-import { PaginationParams } from 'src/utils/pagingQuery';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class PaginationTaskDto implements PaginationParams {
-  page: number;
-  pageSize: number;
-  startTime: number;
-  endTime: number;
-  name: string;
+export class PaginationTaskDto {
+  @IsNumber()
+  page: number = 1;
+  @IsNumber()
+  pageSize: number = 10;
+
+  @IsOptional()
+  @IsNumber()
+  startTime?: number;
+  @IsOptional()
+  @IsNumber()
+  endTime?: number;
+  @IsOptional()
+  @IsString()
+  name?: string;
 }

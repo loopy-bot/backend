@@ -1,11 +1,11 @@
 import axios from 'axios';
-import { Global, Injectable } from '@nestjs/common';
-import { ReplyDto } from './dto/reply.dto';
+import { Global, HttpException, Injectable } from '@nestjs/common';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import { Plugin } from './entities/plugin.entity';
 import { Repository } from 'typeorm';
-import { CreatePluginDto } from './dto/create-plugin.dto';
-import { UpdatePluginDto } from './dto/update-plugin.dto';
+
+import { PluginDto } from './dto/plugin.dto';
 
 @Global()
 @Injectable()
@@ -14,8 +14,8 @@ export class PluginsService {
   private pluginRepository: Repository<Plugin>;
 
   // 新增插件
-  async create(createPluginDto: CreatePluginDto): Promise<Plugin> {
-    return this.pluginRepository.save(createPluginDto);
+  async create(plugin: PluginDto): Promise<Plugin> {
+    return this.pluginRepository.save(plugin);
   }
 
   // 删除插件
@@ -28,8 +28,13 @@ export class PluginsService {
   }
 
   // 修改插件
-  async update(updatePluginDto: UpdatePluginDto): Promise<Plugin> {
-    return this.pluginRepository.save(updatePluginDto);
+  async update(id: string, plugin: PluginDto): Promise<Plugin> {
+    const existingData = await this.findOne(id);
+    if (!existingData) {
+      throw new HttpException(`${id} not found`, 404);
+    }
+    await this.pluginRepository.update(id, plugin);
+    return this.pluginRepository.findOneBy({ id });
   }
 
   // 根据id查找单个插件
@@ -42,15 +47,12 @@ export class PluginsService {
     return this.pluginRepository.find();
   }
 
-  // 调用其他的服务
-  async reply(replyDto: ReplyDto) {
-    const { pluginId, text } = replyDto;
+  async reply(text: string, pluginId: string) {
     const plugin = await this.findOne(pluginId);
     return axios({
       url: plugin.url,
       method: plugin.method,
-      params: { text: text },
-      headers: { responseType: plugin.responseType },
+      params: { text },
     });
   }
 }

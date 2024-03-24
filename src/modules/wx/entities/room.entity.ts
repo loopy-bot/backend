@@ -14,7 +14,7 @@ export class Room extends BaseEntity {
   @Column()
   memberCount: number;
 
-  @ManyToMany(() => Task, (task) => task.friends)
+  @ManyToMany(() => Task, (task) => task.rooms)
   tasks: Task[];
 
   @ManyToOne(() => App, (app) => app.rooms)

@@ -20,9 +20,6 @@ export class Plugin extends BaseEntity {
   @Column()
   method: 'POST' | 'GET';
 
-  @Column()
-  responseType: 'json' | 'arraybuffer';
-
   @ManyToMany(() => App, (app) => app.plugins)
   apps: App[];
 

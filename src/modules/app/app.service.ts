@@ -1,17 +1,14 @@
 import { App } from './entities/app.entity';
-import { Injectable, HttpException, Inject } from '@nestjs/common';
+import { Injectable, HttpException, Inject, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Plugin } from 'src/modules/plugins/entities/plugin.entity';
-import { Friend } from 'src/modules/wx-resource/entities/friend.entity';
-import { Room } from 'src/modules/wx-resource/entities/room.entity';
+import { Friend } from 'src/modules/wx/entities/friend.entity';
+import { Room } from 'src/modules/wx/entities/room.entity';
 import { In, Repository } from 'typeorm';
-import { Qwen } from '../../services/qwen.service';
+import { Model } from '../../services/model.service';
 import { PluginsService } from '../plugins/plugins.service';
-import { CreateAppDto } from './dto/create-app.dto';
-import { UpdateAppDto } from './dto/update-app.dto';
-import { BindAppToFriendsDto, BindAppToPluginsDto, BindAppToRoomsDto } from './dto/bind-app.dto';
-import { GetIntentDto, ReplyDto } from './dto/qwen.dto';
-7;
+import { AppDto } from './dto/app.dto';
+
 @Injectable()
 export class AppService {
   @InjectRepository(App)
@@ -29,35 +26,30 @@ export class AppService {
   @Inject(PluginsService)
   private readonly pluginsService: PluginsService;
 
-  // 动态创建Qwen实例
-  private createQwenInstance(personality: string): Qwen {
-    return new Qwen(personality);
-  }
-
   // 获取所有应用
   async findAll(): Promise<App[]> {
     return this.appRepository.find();
   }
 
-  // 根据id查找应用
+  // 根据id查找应用以及绑定的数据
   async findOne(id: string): Promise<App> {
-    const res = await this.appRepository.findOneBy({ id });
+    const res = await this.appRepository.findOne({ where: { id }, relations: ['plugins', 'friends', 'rooms'] });
+
     return res;
   }
 
   // 创建应用
-  async create(createAppDto: CreateAppDto): Promise<App> {
-    return this.appRepository.save(createAppDto);
+  async create(app: AppDto): Promise<App> {
+    return this.appRepository.save(app);
   }
 
   // 更新应用
-  async update(updateAppDto: UpdateAppDto): Promise<App> {
-    const { id: id, ...info } = updateAppDto;
+  async update(id: string, app: AppDto): Promise<App> {
     const existingData = await this.findOne(id);
     if (!existingData) {
       throw new HttpException(`${id} not found`, 404);
     }
-    await this.appRepository.update(id, info);
+    await this.appRepository.update(id, app);
     return this.appRepository.findOneBy({ id });
   }
 
@@ -71,62 +63,79 @@ export class AppService {
     return !!res;
   }
 
-  // 将应用绑定到多个好友
-  async bindAppToFriends(bindAppToFriendsDto: BindAppToFriendsDto): Promise<App> {
-    const { id, friendIds } = bindAppToFriendsDto;
-    const app = await this.appRepository.findOneOrFail({ where: { id: id }, relations: ['friends'] });
-    const friends = await this.friendRepository.find({ where: { id: In(friendIds) } });
+  private async bindToApp<T>(
+    appId: string,
+    entityIds: string[] = [],
+    entityRepository: Repository<T>,
+    relationKey: string,
+  ): Promise<App> {
+    const app = await this.appRepository.findOneOrFail({
+      where: { id: appId },
+      relations: [relationKey],
+    });
 
-    app.friends = [...app.friends, ...friends];
+    if (!app) {
+      throw new NotFoundException(`App with ID ${appId} not found`);
+    }
+
+    // 这里使用了 Partial<T>[] 作为类型注解，因为我们不需要整个实体的所有属性
+    const entities: Partial<T>[] = await entityRepository.find({
+      where: { id: In(entityIds) } as any,
+    });
+
+    if (!entities.length) {
+      throw new NotFoundException(`${relationKey} with IDs ${entityIds?.join(', ')} not found`);
+    }
+
+    // 使用现有的关系字段或默认到空数组，避免重复添加相同的实体
+    app[relationKey] = [...app[relationKey], ...entities];
+
     return this.appRepository.save(app);
+  }
+
+  // 将应用绑定到多个好友
+  async bindFriendToApp(id: string, friendIds: string[]): Promise<App> {
+    return this.bindToApp(id, friendIds, this.friendRepository, 'friends');
   }
 
   // 将应用绑定到多个群组
-  async bindAppToRooms(bindAppToRoomsDto: BindAppToRoomsDto): Promise<App> {
-    const { id, roomIds } = bindAppToRoomsDto;
-    const app = await this.appRepository.findOneOrFail({ where: { id: id }, relations: ['rooms'] });
-    const rooms = await this.roomRepository.find({ where: { id: In(roomIds) } });
-    app.rooms = [...app.rooms, ...rooms];
-    return this.appRepository.save(app);
+  async bindRoomsToApp(id: string, roomIds: string[]): Promise<App> {
+    return this.bindToApp(id, roomIds, this.roomRepository, 'rooms');
   }
 
   // 给应用绑定插件
-  async bindAppToPlugins(bindAppToPluginsDto: BindAppToPluginsDto): Promise<App> {
-    const { id, pluginIds } = bindAppToPluginsDto;
-    const app = await this.appRepository.findOneOrFail({ where: { id: id }, relations: ['plugins'] });
-    const plugins = await this.pluginRepository.find({ where: { id: In(pluginIds) } });
-    app.plugins = [...app.plugins, ...plugins];
-    return this.appRepository.save(app);
+  async bindPluginToApp(id: string, pluginIds: string[]): Promise<App> {
+    return this.bindToApp(id, pluginIds, this.pluginRepository, 'plugins');
   }
 
   // 根据用户问题推测用户意图
-  async getIntent(getIntentDto: GetIntentDto) {
-    const { id, text } = getIntentDto;
-    const app = await this.findOne(id);
-    const qwen = this.createQwenInstance(app.personality);
+  async getIntent(app: App, text: string) {
     const pluginTypes = app.plugins.map((i) => i.type);
-    const intentType = await qwen.genarate(
-      `请你根据用户问题推测用户意图，意图是固定的，只有如下几个：${pluginTypes}，如果用户意图属于这其中一个。那就把这个值单独返回出来，否则就返回null。问题如下：${text}`,
-    );
+    const intentType = Model.genarate({
+      model: app.model,
+      personality: app.personality,
+      question: `请你根据用户问题推测用户意图，意图是固定的，只有如下几个：${pluginTypes}，如果用户意图属于这其中一个。那就把这个值单独返回出来，否则就返回null。问题如下：${text}`,
+    });
     return intentType;
   }
 
   // 应用回复
-  async reply(replyDto: ReplyDto) {
-    const { id, text } = replyDto;
-    const app = await this.findOne(id);
-    const qwen = this.createQwenInstance(app.personality);
-    const intent = await this.getIntent({ id, text });
+  async reply(key, app: App, text: string) {
+    let data;
+    const intent = await this.getIntent(app, text);
     const plugin = app.plugins.find((i) => i.type === intent);
+
     if (plugin) {
-      return this.pluginsService.reply({
-        pluginId: plugin.id,
-        text,
-      });
+      data = this.pluginsService.reply(text, plugin.id);
     } else {
-      return new Promise((resolve) => {
-        qwen.chat(id, text, resolve);
+      data = Model.chat({
+        model: app.model,
+        personality: app.personality,
+        question: text,
+        key,
       });
     }
+    data = await data;
+    return data;
   }
 }

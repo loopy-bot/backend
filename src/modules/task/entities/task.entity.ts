@@ -1,7 +1,7 @@
 import { BaseEntity } from 'src/common/base-class/base-entity';
 import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
-import { Friend } from 'src/modules/wx-resource/entities/friend.entity';
-import { Room } from 'src/modules/wx-resource/entities/room.entity';
+import { Friend } from 'src/modules/wx/entities/friend.entity';
+import { Room } from 'src/modules/wx/entities/room.entity';
 import { Plugin } from 'src/modules/plugins/entities/plugin.entity';
 
 @Entity()
