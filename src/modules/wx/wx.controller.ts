@@ -5,9 +5,9 @@ import { Room } from './entities/room.entity';
 import { Friend } from './entities/friend.entity';
 
 import { PaginationWxResourceDto } from './dto/pagination-wx-resource.dto';
-import { FrientDto } from './dto/wx-resource.dto';
+import { FrientDto, GetFriendDetailDto, GetRoomDetailDto, MessageDto } from './dto/wx-resource.dto';
 import { AppService } from '../app/app.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('微信资源管理')
 @Controller('wx')
@@ -42,66 +42,28 @@ export class WxController {
 
   // 根据ID获取朋友
   @ApiOperation({ summary: '根据ID获取朋友详细' })
+  @ApiBody({ type: GetFriendDetailDto })
   @Post('resource/friends/detail')
-  findFriendById(@Body('id') id: string) {
+  findFriendById(@Body() { id }: GetFriendDetailDto) {
     return this.wxService.findFriendById(id);
   }
 
   // 根据ID获取群聊
   @ApiOperation({ summary: '根据ID获取群聊详细' })
+  @ApiBody({ type: GetRoomDetailDto })
   @Post('resource/rooms/detail')
-  findRoomById(@Body('id') id: string) {
+  findRoomById(@Body() { id }: GetRoomDetailDto) {
     return this.wxService.findRoomById(id);
   }
 
-  // 添加朋友
-  @ApiOperation({ summary: '添加朋友' })
-  @Post('resource/friends/create')
-  addFriend(@Body() friendData: Partial<Friend>) {
-    return this.wxService.addFriend(friendData);
-  }
-
-  // 添加群聊
-  @ApiOperation({ summary: '添加群聊' })
-  @Post('resource/rooms/create')
-  addRoom(@Body() roomData: Partial<Room>): Promise<Room> {
-    return this.wxService.addRoom(roomData);
-  }
-
-  // 删除朋友
-  @ApiOperation({ summary: '删除朋友' })
-  @Post('resource/friends/delete')
-  deleteFriendById(@Body('id') id: string): Promise<void> {
-    return this.wxService.deleteFriendById(id);
-  }
-
-  // 删除群聊
-  @ApiOperation({ summary: '删除群聊' })
-  @Post('resource/rooms/delete')
-  deleteRoomById(@Body('id') id: string): Promise<void> {
-    return this.wxService.deleteRoomById(id);
-  }
-  // 更新朋友
-  @ApiOperation({ summary: '更新朋友' })
-  @Post('resource/friends/edit')
-  updateFriend(@Body('id') id: string, @Body() updateData: FrientDto): Promise<Friend> {
-    return this.wxService.updateFriend(id, updateData);
-  }
-
-  // 更新群聊
-  @ApiOperation({ summary: '更新群聊' })
-  @Post('resource/rooms/edit')
-  updateRoom(@Body('id') id: string, @Body() updateData: Room): Promise<Room> {
-    return this.wxService.updateRoom(id, updateData);
-  }
-
   @ApiOperation({ summary: '机器人消息' })
+  @ApiBody({ type: MessageDto })
   @Post('message')
-  async onMessage(@Body() body: { roomId: string; friendId: string; question: string }) {
-    const { roomId, friendId, question } = body;
+  async onMessage(@Body() { key, question }: MessageDto) {
+    const [roomId, friendId] = key.split('_');
     const { findAppByFriendWxId, findAppByRoomWxId } = this.wxService;
-    const app = roomId === 'person' ? await findAppByFriendWxId(friendId) : await findAppByRoomWxId(roomId);
-    return this.appService.reply(roomId + friendId, app, question);
+    const app = key.includes('person') ? await findAppByFriendWxId(friendId) : await findAppByRoomWxId(roomId);
+    return this.appService.reply(key, app, question);
   }
 
   @ApiOperation({ summary: '获取任务列表' })
@@ -116,4 +78,45 @@ export class WxController {
       roomTasks: roomTasks.flat(),
     };
   }
+
+  // // 添加朋友
+  // @ApiOperation({ summary: '添加朋友' })
+  // @Post('resource/friends/create')
+  // addFriend(@Body() friendData: Partial<Friend>) {
+  //   return this.wxService.addFriend(friendData);
+  // }
+
+  // // 添加群聊
+  // @ApiOperation({ summary: '添加群聊' })
+  // @Post('resource/rooms/create')
+  // addRoom(@Body() roomData: Partial<Room>): Promise<Room> {
+  //   return this.wxService.addRoom(roomData);
+  // }
+
+  // // 删除朋友
+  // @ApiOperation({ summary: '删除朋友' })
+  // @Post('resource/friends/delete')
+  // deleteFriendById(@Body('id') id: string): Promise<void> {
+  //   return this.wxService.deleteFriendById(id);
+  // }
+
+  // // 删除群聊
+  // @ApiOperation({ summary: '删除群聊' })
+  // @Post('resource/rooms/delete')
+  // deleteRoomById(@Body('id') id: string): Promise<void> {
+  //   return this.wxService.deleteRoomById(id);
+  // }
+  // // 更新朋友
+  // @ApiOperation({ summary: '更新朋友' })
+  // @Post('resource/friends/edit')
+  // updateFriend(@Body('id') id: string, @Body() updateData: FrientDto): Promise<Friend> {
+  //   return this.wxService.updateFriend(id, updateData);
+  // }
+
+  // // 更新群聊
+  // @ApiOperation({ summary: '更新群聊' })
+  // @Post('resource/rooms/edit')
+  // updateRoom(@Body('id') id: string, @Body() updateData: Room): Promise<Room> {
+  //   return this.wxService.updateRoom(id, updateData);
+  // }
 }

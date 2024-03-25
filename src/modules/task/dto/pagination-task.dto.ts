@@ -9,17 +9,17 @@ export class PaginationTaskDto {
   @IsNumber()
   pageSize: number = 10;
 
-  @ApiProperty({ description: '开始区间' })
+  @ApiProperty({ description: '开始区间', required: false })
   @IsOptional()
   @IsNumber()
   startTime?: number;
 
-  @ApiProperty({ description: '结束区间' })
+  @ApiProperty({ description: '结束区间', required: false })
   @IsOptional()
   @IsNumber()
   endTime?: number;
 
-  @ApiProperty({ description: '插件名称' })
+  @ApiProperty({ description: '插件名称', required: false })
   @IsOptional()
   @IsString()
   name?: string;
