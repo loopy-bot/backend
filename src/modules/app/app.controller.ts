@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Param, NotFoundException } from '@nestjs/common';
 import { App } from './entities/app.entity';
 import { AppService } from './app.service';
-import { AppDto, BindFriendsOrPluginsOrRoomsDto, DeleteAppDto, GetAppDetailDto, UpdateAppDto } from './dto/app.dto';
+import { AppDto, BindPluginsDto, DeleteAppDto, GetAppDetailDto, UpdateAppDto } from './dto/app.dto';
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('应用管理')
@@ -42,23 +42,10 @@ export class AppController {
     return this.appService.delete(id);
   }
 
-  @ApiOperation({ summary: '绑定资源' })
-  @ApiParam({ name: 'entityType', enum: ['friends', 'rooms', 'plugins'], description: '绑定资源的名称' })
-  @ApiBody({ type: BindFriendsOrPluginsOrRoomsDto })
-  @Post(':entityType/bind')
-  async bindEntity(
-    @Param('entityType') entityType: 'friends' | 'rooms' | 'plugins',
-    @Body() { id: appId, entityIds }: BindFriendsOrPluginsOrRoomsDto,
-  ) {
-    switch (entityType) {
-      case 'friends':
-        return this.appService.bindFriendToApp(appId, entityIds);
-      case 'rooms':
-        return this.appService.bindRoomsToApp(appId, entityIds);
-      case 'plugins':
-        return this.appService.bindPluginToApp(appId, entityIds);
-      default:
-        throw new NotFoundException(`Invalid entity type ${entityType}`);
-    }
+  @ApiOperation({ summary: '绑定插件' })
+  @ApiBody({ type: BindPluginsDto })
+  @Post('plugins/bind')
+  async bindEntity(@Body() { id: appId, plugins }: BindPluginsDto) {
+    return this.appService.bindPluginToApp(appId, plugins);
   }
 }

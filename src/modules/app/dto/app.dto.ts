@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsArray, IsOptional, IsString } from 'class-validator';
 
 export class AppDto {
   @ApiProperty({ description: '应用名称' })
@@ -43,12 +43,12 @@ export class GetAppDetailDto {
   id: string;
 }
 
-export class BindFriendsOrPluginsOrRoomsDto {
+export class BindPluginsDto {
   @ApiProperty({ description: '应用ID' })
   @IsString()
   id: string;
 
-  @ApiProperty({ description: 'ID组' })
-  @IsString()
-  entityIds: string[];
+  @ApiProperty({ description: 'ID组', type: Array<string> })
+  @IsArray()
+  plugins: string[];
 }

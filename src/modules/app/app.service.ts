@@ -14,12 +14,6 @@ export class AppService {
   @InjectRepository(App)
   private readonly appRepository: Repository<App>;
 
-  @InjectRepository(Friend)
-  private friendRepository: Repository<Friend>;
-
-  @InjectRepository(Room)
-  private roomRepository: Repository<Room>;
-
   @InjectRepository(Plugin)
   private pluginRepository: Repository<Plugin>;
 
@@ -63,49 +57,31 @@ export class AppService {
     return !!res;
   }
 
-  private async bindToApp<T>(
-    appId: string,
-    entityIds: string[] = [],
-    entityRepository: Repository<T>,
-    relationKey: string,
-  ): Promise<App> {
-    const app = await this.appRepository.findOneOrFail({
-      where: { id: appId },
-      relations: [relationKey],
-    });
-
-    if (!app) {
-      throw new NotFoundException(`App with ID ${appId} not found`);
-    }
-
-    // 这里使用了 Partial<T>[] 作为类型注解，因为我们不需要整个实体的所有属性
-    const entities: Partial<T>[] = await entityRepository.find({
-      where: { id: In(entityIds) } as any,
-    });
-
-    if (!entities.length) {
-      throw new NotFoundException(`${relationKey} with IDs ${entityIds?.join(', ')} not found`);
-    }
-
-    // 使用现有的关系字段或默认到空数组，避免重复添加相同的实体
-    app[relationKey] = [...app[relationKey], ...entities];
-
-    return this.appRepository.save(app);
-  }
-
-  // 将应用绑定到多个好友
-  async bindFriendToApp(id: string, friendIds: string[]): Promise<App> {
-    return this.bindToApp(id, friendIds, this.friendRepository, 'friends');
-  }
-
-  // 将应用绑定到多个群组
-  async bindRoomsToApp(id: string, roomIds: string[]): Promise<App> {
-    return this.bindToApp(id, roomIds, this.roomRepository, 'rooms');
-  }
-
   // 给应用绑定插件
   async bindPluginToApp(id: string, pluginIds: string[]): Promise<App> {
-    return this.bindToApp(id, pluginIds, this.pluginRepository, 'plugins');
+    let app = await this.appRepository.findOne({ where: { id }, relations: ['plugins'] });
+
+    if (!app) {
+      throw new NotFoundException(`app not found with ID ${id}`);
+    }
+
+    // 从数据库中查找所有新任务
+    const newPlugins = await this.pluginRepository.findBy({ id: In(pluginIds) });
+
+    // 创建一个新集合，该集合由已经存在的任务和新的任务组成，而不会有重复性
+    const uniqueTaskIdSet = new Set([
+      ...app.plugins.map((plugin) => plugin.id),
+      ...newPlugins.map((plugin) => plugin.id),
+    ]);
+    const uniquePlugins = [...uniqueTaskIdSet].map(
+      (pluginId) =>
+        app.plugins.find((plugin) => plugin.id === pluginId) || newPlugins.find((plugin) => plugin.id === pluginId),
+    );
+
+    // 更新实体的任务列表
+    app.plugins = uniquePlugins;
+
+    return app;
   }
 
   // 根据用户问题推测用户意图

@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { In, Like, Repository } from 'typeorm';
 import { Friend } from './entities/friend.entity';
 import { App } from 'src/modules/app/entities/app.entity';
 import { Room } from './entities/room.entity';
 import { PaginationParams, pagingQuery } from 'src/utils/pagingQuery';
+import { Task } from '../task/entities/task.entity';
 
 @Injectable()
 export class WxService {
@@ -13,6 +14,11 @@ export class WxService {
 
   @InjectRepository(Room)
   private roomRepository: Repository<Room>;
+
+  @InjectRepository(App)
+  private appRepository: Repository<App>;
+  @InjectRepository(Task)
+  private taskRepository: Repository<Task>;
 
   // 批量保存朋友
   async saveRooms(rooms: Room[]): Promise<Room[]> {
@@ -23,53 +29,7 @@ export class WxService {
   async saveFriends(friends: Friend[]): Promise<Friend[]> {
     return this.friendRepository.save(friends);
   }
-  // 添加一个朋友
-  async addFriend(friendData: Partial<Friend>): Promise<Friend> {
-    const friend = this.friendRepository.create(friendData);
-    return this.friendRepository.save(friend);
-  }
-
-  // 添加一个群聊
-  async addRoom(roomData: Partial<Room>): Promise<Room> {
-    const room = this.roomRepository.create(roomData);
-    return this.roomRepository.save(room);
-  }
-
-  // 删除一个朋友
-  async deleteFriendById(id: string): Promise<void> {
-    const result = await this.friendRepository.delete(id);
-    if (result.affected === 0) {
-      throw new Error('Friend not found');
-    }
-  }
-
-  // 删除一个群聊
-  async deleteRoomById(id: string): Promise<void> {
-    const result = await this.roomRepository.delete(id);
-    if (result.affected === 0) {
-      throw new Error('Room not found');
-    }
-  }
-
-  // 更新一个朋友
-  async updateFriend(id: string, updateData: Partial<Friend>): Promise<Friend> {
-    await this.friendRepository.update(id, updateData);
-    const updatedFriend = await this.friendRepository.findOneBy({ id });
-    if (!updatedFriend) {
-      throw new Error('Friend not found');
-    }
-    return updatedFriend;
-  }
-
-  // 更新一个群聊
-  async updateRoom(id: string, updateData: Partial<Room>): Promise<Room> {
-    await this.roomRepository.update(id, updateData);
-    const updatedRoom = await this.roomRepository.findOneBy({ id });
-    if (!updatedRoom) {
-      throw new Error('Room not found');
-    }
-    return updatedRoom;
-  }
+  //
   // 查询所有朋友
   async findAllFriends(paginationParams: PaginationParams, conditions: { name: string; wxId: string } = {} as any) {
     // 准备查询条件
@@ -114,10 +74,11 @@ export class WxService {
   }
   // 根据ID查询单个朋友
   async findFriendById(id: string): Promise<Friend> {
-    return this.friendRepository.findOneBy({ id });
+    return this.friendRepository.findOne({ where: { id }, relations: ['app', 'tasks'] });
   }
+  // 根据ID查询单个群聊
   async findRoomById(id: string): Promise<Room> {
-    return this.roomRepository.findOneBy({ id });
+    return this.roomRepository.findOne({ where: { id }, relations: ['app', 'tasks'] });
   }
 
   async findAppByFriendWxId(wxId: string): Promise<App> {
@@ -144,4 +105,99 @@ export class WxService {
 
     return room.app;
   }
+
+  async bindTaskToFriendOrRoom(id: string, taskIds: string[], type: 'friend' | 'room') {
+    const entity =
+      type === 'friend'
+        ? await this.friendRepository.findOne({ where: { id }, relations: ['tasks'] })
+        : await this.roomRepository.findOne({ where: { id }, relations: ['tasks'] });
+    if (!entity) {
+      throw new NotFoundException(`${type} not found`);
+    }
+    // 从数据库中查找所有新任务
+    const newTasks = await this.taskRepository.findBy({ id: In(taskIds) });
+    console.log(entity);
+    // 创建一个新集合，该集合由已经存在的任务和新的任务组成，而不会有重复性
+    const uniqueTaskIdSet = new Set([...entity.tasks.map((task) => task.id), ...newTasks.map((task) => task.id)]);
+    const uniqueTasks = [...uniqueTaskIdSet].map(
+      (taskId) => entity.tasks.find((task) => task.id === taskId) || newTasks.find((task) => task.id === taskId),
+    );
+
+    // 更新实体的任务列表
+    entity.tasks = uniqueTasks;
+    // 保存更新后的实体
+    if (type === 'friend') {
+      await this.friendRepository.save(entity);
+    } else {
+      await this.roomRepository.save(entity);
+    }
+
+    return entity;
+  }
+  async bindAppToFriendOrRoom(id: string, appId: string, type: 'friend' | 'room') {
+    const entity =
+      type === 'friend'
+        ? await this.friendRepository.findOne({ where: { id }, relations: ['app'] })
+        : await this.roomRepository.findOne({ where: { id }, relations: ['app'] });
+
+    if (!entity) {
+      throw new NotFoundException(`${type} not found`);
+    }
+
+    const app = await this.appRepository.findOneBy({ id: appId });
+    if (!app) {
+      throw new NotFoundException(`app not found`);
+    }
+    entity.app = app;
+    type === 'friend' ? await this.friendRepository.save(entity) : await this.roomRepository.save(entity);
+    return entity;
+  }
+
+  // 添加一个朋友
+  // async addFriend(friendData: Partial<Friend>): Promise<Friend> {
+  //   const friend = this.friendRepository.create(friendData);
+  //   return this.friendRepository.save(friend);
+  // }
+
+  // // 添加一个群聊
+  // async addRoom(roomData: Partial<Room>): Promise<Room> {
+  //   const room = this.roomRepository.create(roomData);
+  //   return this.roomRepository.save(room);
+  // }
+
+  // // 删除一个朋友
+  // async deleteFriendById(id: string): Promise<void> {
+  //   const result = await this.friendRepository.delete(id);
+  //   if (result.affected === 0) {
+  //     throw new Error('Friend not found');
+  //   }
+  // }
+
+  // // 删除一个群聊
+  // async deleteRoomById(id: string): Promise<void> {
+  //   const result = await this.roomRepository.delete(id);
+  //   if (result.affected === 0) {
+  //     throw new Error('Room not found');
+  //   }
+  // }
+
+  // // 更新一个朋友
+  // async updateFriend(id: string, updateData: Partial<Friend>): Promise<Friend> {
+  //   await this.friendRepository.update(id, updateData);
+  //   const updatedFriend = await this.friendRepository.findOneBy({ id });
+  //   if (!updatedFriend) {
+  //     throw new Error('Friend not found');
+  //   }
+  //   return updatedFriend;
+  // }
+
+  // // 更新一个群聊
+  // async updateRoom(id: string, updateData: Partial<Room>): Promise<Room> {
+  //   await this.roomRepository.update(id, updateData);
+  //   const updatedRoom = await this.roomRepository.findOneBy({ id });
+  //   if (!updatedRoom) {
+  //     throw new Error('Room not found');
+  //   }
+  //   return updatedRoom;
+  // }
 }

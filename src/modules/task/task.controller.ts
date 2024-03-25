@@ -1,10 +1,10 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { TaskService } from './task.service';
 
 import { PaginationTaskDto } from './dto/pagination-task.dto';
-import { Model } from 'src/services/model.service';
-import { ActiveTaskDto, BindFriendsOrRoomsDto, TaskDto, UpdateTaskDto } from './dto/task.dto';
-import { ApiBody, ApiOAuth2, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+
+import { ActiveTaskDto, TaskDto, UpdateTaskDto } from './dto/task.dto';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('定时任务管理')
 @Controller('task')
@@ -34,18 +34,6 @@ export class TaskController {
   @Post('delete')
   async deleteTaskById(@Body('id') id: string): Promise<string> {
     return this.taskService.deleteTaskById(id);
-  }
-
-  @ApiOperation({ summary: '绑定定时任务到好友/群聊' })
-  @ApiParam({ name: 'type', enum: ['friend', 'room'] })
-  @ApiBody({ type: BindFriendsOrRoomsDto })
-  @Post(':type/bind')
-  async bindTaskToFriend(@Param('type') type, @Body() { id, entityIds }: BindFriendsOrRoomsDto) {
-    if (type === 'friend') {
-      return this.taskService.bindFriendsToTask(id, entityIds);
-    } else if (type === 'room') {
-      return this.taskService.bindRoomsToTask(id, entityIds);
-    }
   }
 
   @ApiOperation({ summary: '激活定时任务' })

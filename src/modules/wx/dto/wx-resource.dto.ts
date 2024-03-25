@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class FrientDto {
   @ApiProperty({
@@ -89,4 +89,34 @@ export class MessageDto {
   @IsNotEmpty()
   @IsString()
   question: string; // 微信id或者备注名称
+}
+
+export class BindDto {
+  @ApiProperty({
+    description: '好友或群聊id',
+    type: String,
+  })
+  @IsNotEmpty()
+  @IsString()
+  id: string;
+}
+
+export class BindTaskDto extends BindDto {
+  @ApiProperty({
+    description: '任务id组',
+    type: Array<string>,
+  })
+  @IsNotEmpty()
+  @IsArray()
+  taskIds: string[]; // 任务id
+}
+
+export class BindAppDto extends BindDto {
+  @ApiProperty({
+    description: '应用id',
+    type: String,
+  })
+  @IsNotEmpty()
+  @IsString()
+  appId: string; // 任务id
 }

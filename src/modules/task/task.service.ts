@@ -55,39 +55,4 @@ export class TaskService {
     }
     return 'ok';
   }
-
-  async bindFriendsToTask(id: string, friendIds: string[]) {
-    // 查找任务
-    const task = await this.taskRepository.findOne({ where: { id }, relations: ['friends'] });
-    if (!task) {
-      throw new Error('Task not found');
-    }
-    // 查找好友列表
-    const friends = await this.friendRepository.find({ where: { id: In(friendIds) } });
-    if (friends.length !== friendIds.length) {
-      throw new Error('One or more Friends not found');
-    }
-    // 绑定好友到任务
-    task.friends = friends;
-    await this.taskRepository.save(task);
-
-    return task;
-  }
-
-  async bindRoomsToTask(id: string, roomIds: string[]) {
-    // 查找任务
-    const task = await this.taskRepository.findOne({ where: { id }, relations: ['rooms'] });
-    if (!task) {
-      throw new Error('Task not found');
-    }
-    // 查找好友列表
-    const rooms = await this.roomRepository.find({ where: { id: In(roomIds) } });
-    if (rooms.length !== roomIds.length) {
-      throw new Error('One or more Rooms not found');
-    }
-    // 绑定好友到任务
-    task.rooms = rooms;
-    await this.taskRepository.save(task);
-    return task;
-  }
 }

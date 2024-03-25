@@ -37,16 +37,6 @@ export class GetTaskDetailDto {
   id: string;
 }
 
-export class BindFriendsOrRoomsDto {
-  @ApiProperty({ description: '任务id' })
-  @IsString()
-  id: string;
-
-  @ApiProperty({ description: '资源id集合' })
-  @IsString()
-  entityIds: string[];
-}
-
 export class ActiveTaskDto {
   @ApiProperty({ description: '任务id' })
   @IsString()

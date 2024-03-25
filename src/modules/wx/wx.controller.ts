@@ -1,13 +1,20 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { WxService } from './wx.service';
 
 import { Room } from './entities/room.entity';
 import { Friend } from './entities/friend.entity';
 
 import { PaginationWxResourceDto } from './dto/pagination-wx-resource.dto';
-import { FrientDto, GetFriendDetailDto, GetRoomDetailDto, MessageDto } from './dto/wx-resource.dto';
+import {
+  BindAppDto,
+  BindTaskDto,
+  FrientDto,
+  GetFriendDetailDto,
+  GetRoomDetailDto,
+  MessageDto,
+} from './dto/wx-resource.dto';
 import { AppService } from '../app/app.service';
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('微信资源管理')
 @Controller('wx')
@@ -79,6 +86,23 @@ export class WxController {
     };
   }
 
+  @ApiOperation({ summary: '绑定定时任务' })
+  @ApiBody({ type: BindTaskDto })
+  @ApiParam({ name: 'type', description: 'friend or room', enum: ['friend', 'room'] })
+  @Post(':type/task/bind')
+  async bindTask(@Param('type') type, @Body() { id, taskIds }: BindTaskDto) {
+    if (type === 'friend') return this.wxService.bindTaskToFriendOrRoom(id, taskIds, type);
+    return this.wxService.bindTaskToFriendOrRoom(id, taskIds, type);
+  }
+
+  @ApiOperation({ summary: '绑定应用' })
+  @ApiParam({ name: 'type', description: 'friend or room', enum: ['friend', 'room'] })
+  @ApiBody({ type: BindAppDto })
+  @Post(':type/app/bind')
+  async bindApp(@Param('type') type, @Body() { id, appId }: BindAppDto) {
+    if (type === 'friend') return this.wxService.bindAppToFriendOrRoom(id, appId, 'friend');
+    return this.wxService.bindAppToFriendOrRoom(id, appId, 'room');
+  }
   // // 添加朋友
   // @ApiOperation({ summary: '添加朋友' })
   // @Post('resource/friends/create')
