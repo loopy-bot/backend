@@ -1,14 +1,15 @@
-import { Column, Entity, JoinColumn, ManyToMany, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, Unique } from 'typeorm';
 import { BaseEntity } from 'src/common/base-class/base-entity';
 import { App } from 'src/modules/app/entities/app.entity';
 import { Task } from 'src/modules/task/entities/task.entity';
 
 @Entity()
+@Unique(['wxId'])
 export class Room extends BaseEntity {
   @Column()
   name: string;
 
-  @Column({ type: 'longtext' })
+  @Column()
   wxId: string;
 
   @Column()

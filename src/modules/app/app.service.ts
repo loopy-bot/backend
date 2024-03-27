@@ -68,19 +68,9 @@ export class AppService {
     // 从数据库中查找所有新任务
     const newPlugins = await this.pluginRepository.findBy({ id: In(pluginIds) });
 
-    // 创建一个新集合，该集合由已经存在的任务和新的任务组成，而不会有重复性
-    const uniqueTaskIdSet = new Set([
-      ...app.plugins.map((plugin) => plugin.id),
-      ...newPlugins.map((plugin) => plugin.id),
-    ]);
-    const uniquePlugins = [...uniqueTaskIdSet].map(
-      (pluginId) =>
-        app.plugins.find((plugin) => plugin.id === pluginId) || newPlugins.find((plugin) => plugin.id === pluginId),
-    );
-
     // 更新实体的任务列表
-    app.plugins = uniquePlugins;
-
+    app.plugins = newPlugins;
+    this.appRepository.save(app);
     return app;
   }
 

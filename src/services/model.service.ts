@@ -8,19 +8,28 @@ interface ModelParams {
   personality?: string;
   config?: Record<Type, any>;
 }
+const baseUrl = 'http://123.60.1.214:8082';
 @Injectable()
 export class Model {
   static async genarate(params: ModelParams = { model: 'qwen' }) {
     return axios({
-      url: 'http://127.0.0.1:8766/generate',
+      url: baseUrl + '/model/generate',
       method: 'post',
-      params,
+      params: {
+        ...params,
+        config: {
+          kimi: {},
+          qwen: {
+            model: 'qwen-turbo',
+          },
+        },
+      },
     }).then((res) => res.data);
   }
 
   static async chat(params: ModelParams & { key?: string } = { model: 'qwen' }) {
     return axios({
-      url: 'http://127.0.0.1:8766/chat',
+      url: baseUrl + '/model/chat',
       method: 'post',
       params,
     }).then((res) => res.data);

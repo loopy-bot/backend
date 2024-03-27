@@ -21,13 +21,24 @@ export class WxService {
   private taskRepository: Repository<Task>;
 
   // 批量保存朋友
-  async saveRooms(rooms: Room[]): Promise<Room[]> {
-    return this.roomRepository.save(rooms);
+  async saveRooms(rooms: Room[]) {
+    const arr = await this.roomRepository.find();
+    const newRooms = rooms.filter((i) => !arr.map((i) => i.wxId).includes(i.wxId));
+    if (newRooms.length) {
+      await this.roomRepository.save(newRooms);
+    }
+    return 'ok';
   }
 
   // 批量保存朋友
-  async saveFriends(friends: Friend[]): Promise<Friend[]> {
-    return this.friendRepository.save(friends);
+  async saveFriends(friends: Friend[]) {
+    const arr = await this.friendRepository.find();
+    const newFriends = friends.filter((i) => !arr.map((i) => i.wxId).includes(i.wxId));
+
+    if (newFriends.length) {
+      this.friendRepository.save(newFriends);
+    }
+    return 'ok';
   }
   //
   // 查询所有朋友
@@ -116,15 +127,9 @@ export class WxService {
     }
     // 从数据库中查找所有新任务
     const newTasks = await this.taskRepository.findBy({ id: In(taskIds) });
-    console.log(entity);
-    // 创建一个新集合，该集合由已经存在的任务和新的任务组成，而不会有重复性
-    const uniqueTaskIdSet = new Set([...entity.tasks.map((task) => task.id), ...newTasks.map((task) => task.id)]);
-    const uniqueTasks = [...uniqueTaskIdSet].map(
-      (taskId) => entity.tasks.find((task) => task.id === taskId) || newTasks.find((task) => task.id === taskId),
-    );
 
     // 更新实体的任务列表
-    entity.tasks = uniqueTasks;
+    entity.tasks = newTasks;
     // 保存更新后的实体
     if (type === 'friend') {
       await this.friendRepository.save(entity);

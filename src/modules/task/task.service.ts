@@ -6,6 +6,7 @@ import { pagingQuery } from 'src/utils/pagingQuery';
 
 import { PaginationTaskDto } from './dto/pagination-task.dto';
 import { TaskDto } from './dto/task.dto';
+import { Model } from 'src/services/model.service';
 
 @Injectable()
 export class TaskService {
@@ -56,14 +57,16 @@ export class TaskService {
         // 处理保存失败的情况
         throw new Error(`Failed to save the task: ${error.message}`);
       }
-      return this.generate(task.text);
+      const res = await this.generate(task.text);
+      return res;
     }
   }
   private async generate(text: string) {
     // const res = await Model.genarate({
-    //   model: 'kimi',
-    //   question: task.text,
+    //   model: 'qwen',
+    //   question: text,
     // });
+    // console.log(res);
     return text;
   }
   async deleteTaskById(id: string) {

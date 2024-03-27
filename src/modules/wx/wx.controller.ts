@@ -78,8 +78,26 @@ export class WxController {
   async getTasks() {
     const { friends, rooms } = await this.wxService.findAllTasks();
 
-    const friendTasks = friends.filter((i) => i.tasks?.length).map((i) => i.tasks);
-    const roomTasks = rooms.filter((i) => i.tasks?.length).map((i) => i.tasks);
+    const friendTasks = friends
+      .filter((i) => i.tasks?.length)
+      .map((i) =>
+        i.tasks.map((task) => {
+          return {
+            wxId: i.wxId,
+            ...task,
+          };
+        }),
+      );
+    const roomTasks = rooms
+      .filter((i) => i.tasks?.length)
+      .map((i) =>
+        i.tasks.map((task) => {
+          return {
+            wxId: i.wxId,
+            ...task,
+          };
+        }),
+      );
     return {
       friendTasks: friendTasks.flat(),
       roomTasks: roomTasks.flat(),
