@@ -14,7 +14,7 @@ export class TaskController {
   @ApiOperation({ summary: '创建定时任务' })
   @Post('create')
   async addTask(@Body() addTaskDto: TaskDto) {
-    return this.taskService.addTask(addTaskDto);
+    return this.taskService.addTask(new TaskDto(addTaskDto));
   }
 
   @ApiOperation({ summary: '编辑定时任务' })
@@ -24,7 +24,7 @@ export class TaskController {
     return this.taskService.updateTask(id, editTaskDto);
   }
 
-  @ApiOperation({ summary: '获取定时任务列表' })
+  @ApiOperation({ summary: '定时任务列表' })
   @Post('list')
   async findAllTasks(@Body() paginationTaskDto: PaginationTaskDto): Promise<any> {
     return this.taskService.findAllTasks(paginationTaskDto);
@@ -40,14 +40,6 @@ export class TaskController {
   @ApiBody({ type: ActiveTaskDto })
   @Post('active')
   async onTaskActive(@Body() { id }: ActiveTaskDto) {
-    const task = await this.taskService.findOneTaskById(id);
-    if (!task) {
-      throw new Error('Task not found');
-    }
-    // const res = await Model.genarate({
-    //   model: 'kimi',
-    //   question: task.text,
-    // });
-    return task.text;
+    return this.taskService.activeTask(id);
   }
 }

@@ -1,24 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { Task } from './entities/task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
-import { pagingQuery, getTimestamp } from 'src/utils/pagingQuery';
+import { Like, Repository } from 'typeorm';
+import { pagingQuery } from 'src/utils/pagingQuery';
 
 import { PaginationTaskDto } from './dto/pagination-task.dto';
-import { Friend } from '../wx/entities/friend.entity';
-import { Room } from '../wx/entities/room.entity';
-import { Model } from 'src/services/model.service';
-import { text } from 'stream/consumers';
 import { TaskDto } from './dto/task.dto';
 
 @Injectable()
 export class TaskService {
   @InjectRepository(Task)
   private taskRepository: Repository<Task>;
-  @InjectRepository(Friend)
-  private friendRepository: Repository<Friend>;
-  @InjectRepository(Room)
-  private roomRepository: Repository<Room>;
 
   async addTask(addTaskDto: TaskDto) {
     const val = this.taskRepository.create(addTaskDto);
@@ -39,15 +31,41 @@ export class TaskService {
   }
 
   async findAllTasks(paginationTaskDto: PaginationTaskDto) {
-    let time = null;
-    const { startTime, endTime, name, ...paginationParams } = paginationTaskDto;
-    if (startTime && endTime) {
-      time = getTimestamp(startTime, endTime);
+    let likeName = null;
+    const { name, ...paginationParams } = paginationTaskDto;
+    if (name) {
+      likeName = Like(`%${name}%`);
     }
-    const res = await pagingQuery(paginationParams, { name, time }, this.taskRepository);
+    const res = await pagingQuery(paginationParams, { name: likeName }, this.taskRepository);
     return res;
   }
-
+  async activeTask(id: string) {
+    const task = await this.findOneTaskById(id);
+    if (!task) {
+      throw new Error('Task not found');
+    }
+    if (task.count === 0) {
+      return '$done';
+    } else if (task.count === null) {
+      return this.generate(task.text);
+    } else {
+      try {
+        task.count -= 1;
+        await this.taskRepository.save(task);
+      } catch (error) {
+        // 处理保存失败的情况
+        throw new Error(`Failed to save the task: ${error.message}`);
+      }
+      return this.generate(task.text);
+    }
+  }
+  private async generate(text: string) {
+    // const res = await Model.genarate({
+    //   model: 'kimi',
+    //   question: task.text,
+    // });
+    return text;
+  }
   async deleteTaskById(id: string) {
     const res = await this.taskRepository.delete(id);
     if (res.affected === 0) {

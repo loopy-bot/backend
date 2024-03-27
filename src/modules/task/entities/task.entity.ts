@@ -1,5 +1,5 @@
 import { BaseEntity } from 'src/common/base-class/base-entity';
-import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
+import { Column, Entity, IsNull, JoinTable, ManyToMany } from 'typeorm';
 import { Friend } from 'src/modules/wx/entities/friend.entity';
 import { Room } from 'src/modules/wx/entities/room.entity';
 import { Plugin } from 'src/modules/plugins/entities/plugin.entity';
@@ -9,8 +9,8 @@ export class Task extends BaseEntity {
   @Column()
   name: string;
 
-  @Column({ type: 'bigint' })
-  time: number;
+  @Column()
+  time: string;
 
   @Column()
   description: string;
@@ -18,7 +18,7 @@ export class Task extends BaseEntity {
   @Column()
   text: string;
 
-  @Column()
+  @Column({ nullable: true })
   count: number;
 
   @ManyToMany(() => Friend, (friend) => friend.tasks)

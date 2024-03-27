@@ -12,7 +12,7 @@ interface ModelParams {
 export class Model {
   static async genarate(params: ModelParams = { model: 'qwen' }) {
     return axios({
-      url: 'http://127.0.0.1:8766/chat',
+      url: 'http://127.0.0.1:8766/generate',
       method: 'post',
       params,
     }).then((res) => res.data);

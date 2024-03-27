@@ -5,7 +5,7 @@ import { Task } from 'src/modules//task/entities/task.entity';
 
 @Entity()
 export class Friend extends BaseEntity {
-  @Column()
+  @Column({ type: 'longtext' })
   wxId: string;
 
   @Column()

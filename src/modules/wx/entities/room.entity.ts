@@ -8,7 +8,7 @@ export class Room extends BaseEntity {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ type: 'longtext' })
   wxId: string;
 
   @Column()
