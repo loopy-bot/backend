@@ -4,13 +4,9 @@ import { App } from 'src/modules/app/entities/app.entity';
 import { Task } from 'src/modules/task/entities/task.entity';
 
 @Entity()
-@Unique(['wxId'])
 export class Room extends BaseEntity {
   @Column()
   name: string;
-
-  @Column()
-  wxId: string;
 
   @Column()
   memberCount: number;

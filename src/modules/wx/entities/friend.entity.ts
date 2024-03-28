@@ -4,11 +4,7 @@ import { App } from 'src/modules//app/entities/app.entity';
 import { Task } from 'src/modules//task/entities/task.entity';
 
 @Entity()
-@Unique(['wxId'])
 export class Friend extends BaseEntity {
-  @Column()
-  wxId: string;
-
   @Column()
   name: string;
 

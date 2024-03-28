@@ -6,10 +6,6 @@ export class FrientDto {
     description: '微信id或者备注名称',
     type: String,
   })
-  @IsNotEmpty()
-  @IsString()
-  wxId: string; // 微信id或者备注名称
-
   @ApiProperty({
     description: '姓名',
     type: String,
@@ -32,10 +28,6 @@ export class RoomDto {
     description: '微信id或者备注名称',
     type: String,
   })
-  @IsNotEmpty()
-  @IsString()
-  wxId: string; // 微信id或者备注名称
-
   @ApiProperty({
     description: '姓名',
     type: String,

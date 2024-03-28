@@ -28,6 +28,7 @@ export class WxController {
   @Post('resource/upload')
   async upload(@Body() body: { rooms: Room[]; friends: Friend[] }) {
     const { rooms, friends } = body;
+
     await Promise.all([this.wxService.saveRooms(rooms), this.wxService.saveFriends(friends)]);
     return 'ok';
   }
@@ -83,7 +84,7 @@ export class WxController {
       .map((i) =>
         i.tasks.map((task) => {
           return {
-            wxId: i.wxId,
+            wxName: i.name,
             ...task,
           };
         }),
@@ -93,7 +94,7 @@ export class WxController {
       .map((i) =>
         i.tasks.map((task) => {
           return {
-            wxId: i.wxId,
+            wxName: i.name,
             ...task,
           };
         }),

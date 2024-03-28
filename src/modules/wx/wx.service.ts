@@ -23,7 +23,11 @@ export class WxService {
   // 批量保存朋友
   async saveRooms(rooms: Room[]) {
     const arr = await this.roomRepository.find();
-    const newRooms = rooms.filter((i) => !arr.map((i) => i.wxId).includes(i.wxId));
+
+    const arrName = arr.map((i) => i.name);
+
+    const newRooms = rooms.filter((i) => !arrName.includes(i.name));
+
     if (newRooms.length) {
       await this.roomRepository.save(newRooms);
     }
@@ -33,7 +37,8 @@ export class WxService {
   // 批量保存朋友
   async saveFriends(friends: Friend[]) {
     const arr = await this.friendRepository.find();
-    const newFriends = friends.filter((i) => !arr.map((i) => i.wxId).includes(i.wxId));
+    const arrName = arr.map((i) => i.name);
+    const newFriends = friends.filter((i) => !arrName.includes(i.name));
 
     if (newFriends.length) {
       this.friendRepository.save(newFriends);
@@ -49,9 +54,7 @@ export class WxService {
     if (conditions.name) {
       queryConditions.name = Like(`%${conditions.name}%`);
     }
-    if (conditions.wxId) {
-      queryConditions.wxId = conditions.wxId;
-    }
+
     const res = await pagingQuery(paginationParams, queryConditions, this.friendRepository);
     return res;
   }
@@ -62,9 +65,7 @@ export class WxService {
     if (conditions.name) {
       queryConditions.name = Like(`%${conditions.name}%`);
     }
-    if (conditions.wxId) {
-      queryConditions.wxId = conditions.wxId;
-    }
+
     const res = await pagingQuery(paginationParams, queryConditions, this.roomRepository);
     return res;
   }
@@ -92,9 +93,9 @@ export class WxService {
     return this.roomRepository.findOne({ where: { id }, relations: ['app', 'tasks'] });
   }
 
-  async findAppByFriendWxId(wxId: string): Promise<App> {
+  async findAppByFriendWxId(name: string): Promise<App> {
     const friend = await this.friendRepository.findOne({
-      where: { wxId },
+      where: { name },
       relations: ['app'], // 确保加载了关联的 App 实体
     });
 
@@ -104,9 +105,9 @@ export class WxService {
 
     return friend.app;
   }
-  async findAppByRoomWxId(wxId: string): Promise<App> {
+  async findAppByRoomWxId(name: string): Promise<App> {
     const room = await this.roomRepository.findOne({
-      where: { wxId },
+      where: { name },
       relations: ['app'], // 确保加载了关联的 App 实体
     });
 

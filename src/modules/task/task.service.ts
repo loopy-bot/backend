@@ -62,12 +62,11 @@ export class TaskService {
     }
   }
   private async generate(text: string) {
-    // const res = await Model.genarate({
-    //   model: 'qwen',
-    //   question: text,
-    // });
-    // console.log(res);
-    return text;
+    const res = await Model.genarate({
+      model: 'qwen',
+      question: text,
+    });
+    return res.data.content;
   }
   async deleteTaskById(id: string) {
     const res = await this.taskRepository.delete(id);
