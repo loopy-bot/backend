@@ -28,10 +28,11 @@ export class AppService {
   // 根据id查找应用以及绑定的数据
   async findOne(id: string): Promise<App> {
     const res = await this.appRepository.findOne({ where: { id }, relations: ['plugins', 'friends', 'rooms'] });
-
     return res;
   }
-
+  async findDefaultApp() {
+    return this.appRepository.findOne({ where: { name: 'default' }, relations: ['plugins'] });
+  }
   // 创建应用
   async create(app: AppDto): Promise<App> {
     return this.appRepository.save(app);
@@ -76,23 +77,24 @@ export class AppService {
 
   // 根据用户问题推测用户意图
   async getIntent(app: App, text: string) {
-    const pluginTypes = app.plugins.map((i) => i.type);
-    const intentType = Model.genarate({
+    const pluginTypes = app.plugins?.map((i) => i.type);
+    const intentType = await Model.genarate({
       model: app.model,
       personality: app.personality,
       question: `请你根据用户问题推测用户意图，意图是固定的，只有如下几个：${pluginTypes}，如果用户意图属于这其中一个。那就把这个值单独返回出来，否则就返回null。问题如下：${text}`,
     });
-    return intentType;
+
+    return intentType.text;
   }
 
   // 应用回复
-  async reply(key, app: App, text: string) {
+  async reply(key: string, text: string, app: App) {
     let data;
     const intent = await this.getIntent(app, text);
     const plugin = app.plugins.find((i) => i.type === intent);
-
+    console.log('check plugin', plugin?.name);
     if (plugin) {
-      data = this.pluginsService.reply(text, plugin.id);
+      data = this.pluginsService.reply(text, plugin);
     } else {
       data = Model.chat({
         model: app.model,
@@ -101,7 +103,7 @@ export class AppService {
         key,
       });
     }
-    data = await data;
+    console.log('res', await data);
     return data;
   }
 }

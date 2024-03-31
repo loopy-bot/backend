@@ -2,11 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class PaginationWxResourceDto {
-  @ApiProperty({ description: '微信id', required: false })
-  @IsString()
-  @IsOptional()
-  wxId: string;
-
   @ApiProperty({ description: '资源名称', required: false })
   @IsString()
   @IsOptional()

@@ -66,7 +66,7 @@ export class TaskService {
       model: 'qwen',
       question: text,
     });
-    return res.data.content;
+    return res.text;
   }
   async deleteTaskById(id: string) {
     const res = await this.taskRepository.delete(id);

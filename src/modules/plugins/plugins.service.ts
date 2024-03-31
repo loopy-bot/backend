@@ -47,12 +47,12 @@ export class PluginsService {
     return this.pluginRepository.find();
   }
 
-  async reply(text: string, pluginId: string) {
-    const plugin = await this.findOne(pluginId);
+  async reply(question: string, plugin: Plugin) {
+    console.log(plugin);
     return axios({
       url: plugin.url,
       method: plugin.method,
-      params: { text },
-    });
+      data: { question },
+    }).then((res) => res.data.data);
   }
 }

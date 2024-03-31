@@ -47,7 +47,7 @@ export class WxService {
   }
   //
   // 查询所有朋友
-  async findAllFriends(paginationParams: PaginationParams, conditions: { name: string; wxId: string } = {} as any) {
+  async findAllFriends(paginationParams: PaginationParams, conditions: { name: string } = {} as any) {
     // 准备查询条件
     const queryConditions: any = {};
 
@@ -59,7 +59,7 @@ export class WxService {
     return res;
   }
   // 查询所有群聊
-  async findAllRooms(paginationParams: PaginationParams, conditions: { name: string; wxId: string } = {} as any) {
+  async findAllRooms(paginationParams: PaginationParams, conditions: { name: string } = {} as any) {
     // 准备查询条件
     const queryConditions: any = {};
     if (conditions.name) {
@@ -100,7 +100,7 @@ export class WxService {
     });
 
     if (!friend) {
-      throw new Error('Friend not found');
+      return null;
     }
 
     return friend.app;
@@ -112,7 +112,7 @@ export class WxService {
     });
 
     if (!room) {
-      throw new Error('Friend not found');
+      return null;
     }
 
     return room.app;

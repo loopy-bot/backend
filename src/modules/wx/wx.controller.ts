@@ -36,16 +36,16 @@ export class WxController {
   @ApiOperation({ summary: '获取所有朋友' })
   @Post('resource/friends/list')
   findAllFriends(@Body() body: PaginationWxResourceDto) {
-    const { name, wxId, ...pagnation } = body;
-    return this.wxService.findAllFriends(pagnation, { name, wxId });
+    const { name, ...pagnation } = body;
+    return this.wxService.findAllFriends(pagnation, { name });
   }
 
   // 获取所有群聊
   @ApiOperation({ summary: '获取所有群聊' })
   @Post('resource/rooms/list')
   findAllRooms(@Body() body: PaginationWxResourceDto) {
-    const { name, wxId, ...pagnation } = body;
-    return this.wxService.findAllRooms(pagnation, { name, wxId });
+    const { name, ...pagnation } = body;
+    return this.wxService.findAllRooms(pagnation, { name });
   }
 
   // 根据ID获取朋友
@@ -68,10 +68,16 @@ export class WxController {
   @ApiBody({ type: MessageDto })
   @Post('message')
   async onMessage(@Body() { key, question }: MessageDto) {
-    const [roomId, friendId] = key.split('_');
-    const { findAppByFriendWxId, findAppByRoomWxId } = this.wxService;
-    const app = key.includes('person') ? await findAppByFriendWxId(friendId) : await findAppByRoomWxId(roomId);
-    return this.appService.reply(key, app, question);
+    const [roomName, friendName] = key.split('_');
+    console.log(key, question);
+    let app = key.includes('person')
+      ? await this.wxService.findAppByFriendWxId(friendName)
+      : await this.wxService.findAppByRoomWxId(roomName);
+    if (!app) {
+      app = await this.appService.findDefaultApp();
+    }
+
+    return this.appService.reply(key, question, app);
   }
 
   @ApiOperation({ summary: '获取任务列表' })

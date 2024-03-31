@@ -8,7 +8,8 @@ interface ModelParams {
   personality?: string;
   config?: Record<Type, any>;
 }
-const baseUrl = 'http://123.60.1.214:8080';
+// const baseUrl = 'http://123.60.1.214:8080';
+const baseUrl = 'http://localhost:8082/back';
 @Injectable()
 export class Model {
   static async genarate(params: ModelParams = { model: 'qwen' }) {
@@ -24,7 +25,13 @@ export class Model {
           },
         },
       },
-    }).then((res) => res.data);
+    }).then(({ data: res }) => {
+      return {
+        type: 'text',
+        text: res.data.content,
+        file: null,
+      };
+    });
   }
 
   static async chat(params: ModelParams & { key?: string } = { model: 'qwen' }) {
@@ -32,6 +39,12 @@ export class Model {
       url: baseUrl + '/model/chat',
       method: 'post',
       data: params,
-    }).then((res) => res.data);
+    }).then(({ data: res }) => {
+      return {
+        type: 'text',
+        text: res.data.content,
+        file: null,
+      };
+    });
   }
 }
