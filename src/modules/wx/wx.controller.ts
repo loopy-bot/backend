@@ -73,9 +73,6 @@ export class WxController {
     let app = key.includes('person')
       ? await this.wxService.findAppByFriendWxId(friendName)
       : await this.wxService.findAppByRoomWxId(roomName);
-    if (!app) {
-      app = await this.appService.findDefaultApp();
-    }
 
     return this.appService.reply(key, question, app);
   }

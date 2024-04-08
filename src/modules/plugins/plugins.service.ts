@@ -48,7 +48,6 @@ export class PluginsService {
   }
 
   async reply(question: string, plugin: Plugin) {
-    console.log(plugin);
     return axios({
       url: plugin.url,
       method: plugin.method,

@@ -77,13 +77,20 @@ export class AppService {
 
   // 根据用户问题推测用户意图
   async getIntent(app: App, text: string) {
-    const pluginTypes = app.plugins?.map((i) => i.type);
+    if (!app) throw new NotFoundException('app not found');
+    const pluginTypes = app.plugins?.map((i) => i.type).join('、') || '';
+
     const intentType = await Model.genarate({
       model: app.model,
       personality: app.personality,
-      question: `请你根据用户问题推测用户意图，意图是固定的，只有如下几个：${pluginTypes}，如果用户意图属于这其中一个。那就把这个值单独返回出来，否则就返回null。问题如下：${text}`,
+      question: `请你根据用户问题推测用户意图，意图是固定的，只有如下几个：${pluginTypes}，如果用户意图属于这其中一个。那就把这个值单独返回出来，如果意图有很多，只需要提取第一个意图即可，否则就只需要返回null。
+        例如：
+        问题1：你好，（该问题只是用来询问，并不在插件序列，所以只需要返回null。）
+        问题2：画一只鸟，（该问题强调绘画，如果插件意图里面有能实现绘画的，就把这个值返回出来）
+        
+        问题如下：${text}`,
     });
-
+    console.log('intentType', intentType);
     return intentType.text;
   }
 
@@ -91,8 +98,8 @@ export class AppService {
   async reply(key: string, text: string, app: App) {
     let data;
     const intent = await this.getIntent(app, text);
-    const plugin = app.plugins.find((i) => i.type === intent);
-    console.log('check plugin', plugin?.name);
+    const plugin = app.plugins?.find((i) => intent?.includes(i.type));
+
     if (plugin) {
       data = this.pluginsService.reply(text, plugin);
     } else {

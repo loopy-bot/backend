@@ -1,0 +1,18 @@
+{
+  "apps": [
+      {
+          "name": "backend",
+          "cwd": "./",
+          "script": "./dist/src/main.js",
+          "cron_restart": "0 0 * * *",
+          "log_date_format": "YYYY-MM-DD HH:mm Z",
+          "error_file": "./logs/backend-err.log",
+          "out_file": "./logs/backend-out.log",
+          "pid_file": "./logs/node.pid",
+          "autorestart": true,
+          "instances": 1,
+          "min_uptime": "60s",
+          "max_restarts": 100
+      }
+  ]
+}

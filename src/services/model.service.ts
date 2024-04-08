@@ -8,8 +8,8 @@ interface ModelParams {
   personality?: string;
   config?: Record<Type, any>;
 }
-// const baseUrl = 'http://123.60.1.214:8080';
-const baseUrl = 'http://localhost:8082/back';
+const baseUrl = 'http://123.60.1.214:8082';
+
 @Injectable()
 export class Model {
   static async genarate(params: ModelParams = { model: 'qwen' }) {
@@ -18,12 +18,7 @@ export class Model {
       method: 'post',
       data: {
         ...params,
-        config: {
-          kimi: {},
-          qwen: {
-            model: 'qwen-turbo',
-          },
-        },
+        model: 'qwen',
       },
     }).then(({ data: res }) => {
       return {
