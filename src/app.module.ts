@@ -6,6 +6,7 @@ import { TaskModule } from './modules/task/task.module';
 import { AppModule as App } from './modules/app/app.module';
 import { WxModule } from './modules/wx/wx.module';
 import { PluginsModule } from './modules/plugins/plugins.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { PluginsModule } from './modules/plugins/plugins.module';
     PluginsModule,
     TaskModule,
     WxModule,
+    UploadModule,
   ],
 })
 export class AppModule {}
