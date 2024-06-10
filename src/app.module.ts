@@ -9,6 +9,7 @@ import { PluginsModule } from './modules/plugins/plugins.module';
 import { UploadModule } from './upload/upload.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { SessionModule } from './session/session.module';
 console.log(join(__dirname, '..', 'uploads'))
 @Module({
   imports: [
@@ -30,6 +31,7 @@ console.log(join(__dirname, '..', 'uploads'))
     TaskModule,
     WxModule,
     UploadModule,
+    SessionModule,
   ],
 })
 export class AppModule {}
