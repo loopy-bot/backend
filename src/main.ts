@@ -7,10 +7,12 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { join } from 'path';
 
-
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.enableCors();
+  app.useStaticAssets(join(__dirname, '..', '..', 'uploads'), {
+    prefix: '/static/', //设置虚拟路径
+  });
   app.useGlobalFilters(new HttpExceptionFilter()); // 异常过滤器
   app.useGlobalInterceptors(new TransformInterceptor()); // 响应拦截
   app.useGlobalPipes(new ValidationTypePipe());
@@ -22,7 +24,7 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-
+  
   await app.listen(4433);
 }
 bootstrap();

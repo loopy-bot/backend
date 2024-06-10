@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Query, UploadedFiles, UseInterceptors } fr
 import { UploadService } from './upload.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
+import { FileFilter } from 'src/filters/file-type.filter';
 
 const filePath = 'uploads';
 const chunkPath = filePath + '/chunks_';
@@ -13,12 +14,16 @@ export class UploadController {
   @UseInterceptors(
     FilesInterceptor('files', 20, {
       dest: 'uploads',
+      fileFilter: FileFilter,
     }),
   )
   uploadFiles(@UploadedFiles() files: Array<Express.Multer.File>, @Body() body) {
+    if (!fs.existsSync(filePath)) {
+      fs.mkdirSync(filePath, { recursive: true });
+    }
     const fileName = body.name.match(/(.+)\-\d+$/)[1];
     const chunkDir = chunkPath + fileName;
-
+    
     if (!fs.existsSync(chunkDir)) {
       fs.mkdirSync(chunkDir);
     }

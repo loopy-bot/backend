@@ -16,6 +16,8 @@
 
       fileInput.onchange = async function (event) {
         event.preventDefault();
+
+        // Buffer 数据
         const file = fileInput.files[0];
 
         const chunks = [];
@@ -34,7 +36,7 @@
               return axios.post("http://localhost:4433/file/upload", data);
             })
           );
-          axios.get(`http://localhost:4433/file/merge?name=${file.name}`);  
+          axios.get('http://localhost:4433/file/merge?name=' + file.name)
         } catch (error) {
           console.error("Error uploading file:", error);
           alert("Error uploading file");
