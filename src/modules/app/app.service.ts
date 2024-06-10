@@ -44,7 +44,7 @@ export class AppService {
     if (!existingData) {
       throw new HttpException(`${id} not found`, 404);
     }
-    await this.appRepository.update(id, app);
+    await this.appRepository.save({...existingData,...app });
     return this.appRepository.findOneBy({ id });
   }
 

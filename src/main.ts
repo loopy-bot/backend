@@ -9,12 +9,8 @@ import { join } from 'path';
 
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule,{
-    
-   
-  });
+  const app = await NestFactory.create(AppModule);
   app.enableCors();
-  app.useStaticAssets(join(__dirname, '../uploads'), { prefix: '/static/' });
   app.useGlobalFilters(new HttpExceptionFilter()); // 异常过滤器
   app.useGlobalInterceptors(new TransformInterceptor()); // 响应拦截
   app.useGlobalPipes(new ValidationTypePipe());

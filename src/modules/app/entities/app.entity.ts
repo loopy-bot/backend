@@ -18,6 +18,9 @@ export class App extends BaseEntity {
   @Column()
   personality: string;
 
+  @Column({ type: 'longtext' })
+  session: string;
+
   @OneToMany(() => Friend, (user) => user.app)
   friends: Friend[];
 

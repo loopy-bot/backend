@@ -25,7 +25,7 @@ export class UploadController {
     fs.cpSync(files[0].path, chunkDir + '/' + body.name);
     fs.rmSync(files[0].path);
   }
-
+  
   @Get('merge')
   merge(@Query('name') name: string) {
     try {

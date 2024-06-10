@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class AppDto {
   @ApiProperty({ description: '应用名称' })
@@ -19,6 +19,11 @@ export class AppDto {
   @IsString()
   @IsOptional()
   personality?: string = '你是一个智能助手，用于回答用户问题';
+
+  @ApiProperty({ description: '聊天记录', example: '[{"role":"user","content":"assistant"}]' })
+  @IsString()
+  @IsOptional()
+  session?: string = '你是一个智能助手，用于回答用户问题';
 
   constructor(app: AppDto) {
     Object.assign(this, app);
@@ -51,4 +56,18 @@ export class BindPluginsDto {
   @ApiProperty({ description: 'ID组', type: Array<string> })
   @IsArray()
   plugins: string[];
+}
+
+export class ChatParamsDto {
+  @ApiProperty({ description: '应用ID' })
+  @IsString()
+  id: string;
+  @ApiProperty({ description: '问题' })
+  @IsString()
+  question: string;
+
+  @ApiProperty({ description: '是否开启上网' })
+  @IsBoolean()
+  @IsOptional()
+  use_search?: boolean;
 }
