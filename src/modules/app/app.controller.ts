@@ -6,7 +6,6 @@ import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { KimiModel } from 'src/services/kimi.service';
 import { App } from './entities/app.entity';
 
-
 @ApiTags('应用管理')
 @Controller('application')
 export class AppController {
@@ -64,10 +63,10 @@ export class AppController {
     const app = await this.appService.findOne(id);
 
     session = JSON.parse(app.session) as any[];
-    session.push({ role: 'user', content: question });
 
-    const result = await KimiModel.chat({ messages: session, use_search });
+    const result = await KimiModel.chat({ messages: [...session, message], use_search });
     const response = { role: 'assistant', content: result };
+    session.push({ role: 'user', content: question });
     session.push(response);
 
     const messages = JSON.stringify(session);
@@ -75,5 +74,4 @@ export class AppController {
 
     return response;
   }
-
 }
