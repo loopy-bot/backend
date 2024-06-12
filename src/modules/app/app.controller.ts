@@ -1,9 +1,11 @@
 import { Controller, Post, Body, Param, NotFoundException } from '@nestjs/common';
-import { App } from './entities/app.entity';
+
 import { AppService } from './app.service';
 import { AppDto, BindPluginsDto, ChatParamsDto, DeleteAppDto, GetAppDetailDto, UpdateAppDto } from './dto/app.dto';
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { KimiModel } from 'src/services/kimi.service';
+import { App } from './entities/app.entity';
+
 
 @ApiTags('应用管理')
 @Controller('application')
@@ -56,8 +58,9 @@ export class AppController {
   @ApiBody({ type: ChatParamsDto })
   @Post('chat')
   async chat(@Body() { id, question, use_search = false }: ChatParamsDto) {
+    const prefix = '回复都控制在20-40字内，问题如下：';
     let session: any[];
-    const message = { role: 'user', content: question };
+    const message = { role: 'user', content: prefix + question };
     const app = await this.appService.findOne(id);
 
     session = JSON.parse(app.session) as any[];
@@ -65,11 +68,15 @@ export class AppController {
 
     const result = await KimiModel.chat({ messages: session, use_search });
     const response = { role: 'assistant', content: result };
-    session.push(response)
-    
-    const messages = JSON.stringify(session)
-    await this.appService.update(id, {...app,session:messages});
-   
-    return messages;
+    session.push(response);
+
+    const messages = JSON.stringify(session);
+    await this.appService.update(id, { ...app, session: messages });
+
+    return response;
+  }
+
+  @Post('chat/history') async getChatHistory(@Param('id') id: string) {
+
   }
 }

@@ -9,7 +9,7 @@ import { PluginsModule } from './modules/plugins/plugins.module';
 import { UploadModule } from './upload/upload.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-console.log(join(__dirname, '..', 'uploads'))
+import { AccountModule } from './modules/account/account.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -30,7 +30,7 @@ console.log(join(__dirname, '..', 'uploads'))
     TaskModule,
     WxModule,
     UploadModule,
-
+    AccountModule,
   ],
 })
 export class AppModule {}

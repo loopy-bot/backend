@@ -5,15 +5,15 @@ interface ModelParams {
   messages: any[];
   use_search?: boolean;
 }
-const baseUrl = 'http://47.121.142.148/model/kimi/v1/chat/completions';
+// const baseUrl = 'http://47.121.142.148/model/kimi';
+const baseUrl = 'http://127.0.0.1:8000'
 
 @Injectable()
 export class KimiModel {
   static async chat(params: ModelParams = { messages: [], use_search: false }) {
     try {
-     
       return axios({
-        url: baseUrl,
+        url: baseUrl + '/v1/chat/completions',
         method: 'post',
         data: params,
         headers: {

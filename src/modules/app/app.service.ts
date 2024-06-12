@@ -1,4 +1,4 @@
-import { App } from './entities/app.entity';
+
 import { Injectable, HttpException, Inject, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Plugin } from 'src/modules/plugins/entities/plugin.entity';
@@ -8,6 +8,7 @@ import { In, Repository } from 'typeorm';
 import { Model } from '../../services/model.service';
 import { PluginsService } from '../plugins/plugins.service';
 import { AppDto } from './dto/app.dto';
+import { App } from './entities/app.entity';
 
 @Injectable()
 export class AppService {
