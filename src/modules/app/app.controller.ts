@@ -64,7 +64,7 @@ export class AppController {
     const app = await this.appService.findOne(id);
 
     session = JSON.parse(app.session) as any[];
-    session.push(message);
+    session.push({ role: 'user', content: question });
 
     const result = await KimiModel.chat({ messages: session, use_search });
     const response = { role: 'assistant', content: result };
@@ -76,7 +76,4 @@ export class AppController {
     return response;
   }
 
-  @Post('chat/history') async getChatHistory(@Param('id') id: string) {
-
-  }
 }

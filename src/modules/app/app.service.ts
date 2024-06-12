@@ -1,4 +1,3 @@
-
 import { Injectable, HttpException, Inject, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Plugin } from 'src/modules/plugins/entities/plugin.entity';
@@ -45,7 +44,8 @@ export class AppService {
     if (!existingData) {
       throw new HttpException(`${id} not found`, 404);
     }
-    await this.appRepository.save({...existingData,...app });
+    
+    await this.appRepository.save({ id, ...existingData, ...app });
     return this.appRepository.findOneBy({ id });
   }
 
